@@ -14,6 +14,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
+
 public class ConsumerLoop implements Runnable {
 
     protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
@@ -26,10 +31,10 @@ public class ConsumerLoop implements Runnable {
         this.id = id;
         this.topic = topic;
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
-        props.put("group.id", groupId);
-        props.put("key.deserializer", StringDeserializer.class.getName());
-        props.put("value.deserializer", StringDeserializer.class.getName());
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(GROUP_ID_CONFIG, groupId);
+        props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         this.consumer = new KafkaConsumer<>(props);
     }
 
