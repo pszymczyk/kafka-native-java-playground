@@ -12,7 +12,7 @@ public class Step1Runner {
         String groupId = "step1_1";
         String topic = "step1";
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        ConsumerLoop consumer = new ConsumerLoop(groupId, topic);
+        ConsumerLoop consumer = new ConsumerLoop(0, groupId, topic);
         executor.submit(consumer);
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {

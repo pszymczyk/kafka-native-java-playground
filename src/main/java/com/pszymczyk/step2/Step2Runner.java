@@ -12,12 +12,12 @@ public class Step2Runner {
 
     public static void main(String[] args) {
         int numConsumers = 3;
-        String groupId = "step2_";
+        String groupId = "step2";
         String topic = "step2";
         ExecutorService executor = Executors.newFixedThreadPool(3);
         final List<ConsumerLoop> consumers = new ArrayList<>();
         for (int i = 0; i < numConsumers; i++) {
-            ConsumerLoop consumer = new ConsumerLoop(groupId+i, topic);
+            ConsumerLoop consumer = new ConsumerLoop(i, groupId, topic);
             consumers.add(consumer);
             executor.submit(consumer);
         }

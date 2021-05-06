@@ -19,12 +19,11 @@ public class ConsumerLoop implements Runnable {
     protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
 
     private final KafkaConsumer<String, String> consumer;
-    private final String groupId;
+    private final int id;
     private final String topic;
 
-    public ConsumerLoop(String groupId,
-                        String topic) {
-        this.groupId = groupId;
+    public ConsumerLoop(int id, String groupId, String topic) {
+        this.id = id;
         this.topic = topic;
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
@@ -46,7 +45,7 @@ public class ConsumerLoop implements Runnable {
                     data.put("partition", record.partition());
                     data.put("offset", record.offset());
                     data.put("value", record.value());
-                    logger.info(this.groupId + ": " + data);
+                    logger.info(this.id + ": " + data);
                 }
             }
         } catch (WakeupException e) {
