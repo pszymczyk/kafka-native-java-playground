@@ -1,0 +1,102 @@
+/Library/Java/JavaVirtualMachines/openjdk-14.0.1.jdk/Contents/Home/bin/java -javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=60845:/Applications/IntelliJ IDEA.app/Contents/bin -Dfile.encoding=UTF-8 -classpath /Users/pawel/repo/kafka-native-java-playground/target/classes:/Users/pawel/.m2/repository/org/apache/kafka/kafka-clients/2.7.0/kafka-clients-2.7.0.jar:/Users/pawel/.m2/repository/com/github/luben/zstd-jni/1.4.5-6/zstd-jni-1.4.5-6.jar:/Users/pawel/.m2/repository/org/lz4/lz4-java/1.7.1/lz4-java-1.7.1.jar:/Users/pawel/.m2/repository/org/xerial/snappy/snappy-java/1.1.7.7/snappy-java-1.1.7.7.jar:/Users/pawel/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.12.3/jackson-databind-2.12.3.jar:/Users/pawel/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.12.3/jackson-annotations-2.12.3.jar:/Users/pawel/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.12.3/jackson-core-2.12.3.jar:/Users/pawel/.m2/repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar:/Users/pawel/.m2/repository/org/slf4j/slf4j-log4j12/1.7.25/slf4j-log4j12-1.7.25.jar:/Users/pawel/.m2/repository/log4j/log4j/1.2.17/log4j-1.2.17.jar com.pszymczyk.step9.DuplicateFounder
+21:35:54,859 INFO ConsumerConfig values:
+	allow.auto.create.topics = true
+	auto.commit.interval.ms = 5000
+	auto.offset.reset = earliest
+	bootstrap.servers = [localhost:9092]
+	check.crcs = true
+	client.dns.lookup = use_all_dns_ips
+	client.id = consumer-step5_d990d43-1
+	client.rack =
+	connections.max.idle.ms = 540000
+	default.api.timeout.ms = 60000
+	enable.auto.commit = true
+	exclude.internal.topics = true
+	fetch.max.bytes = 52428800
+	fetch.max.wait.ms = 500
+	fetch.min.bytes = 1
+	group.id = step5_d990d43
+	group.instance.id = null
+	heartbeat.interval.ms = 3000
+	interceptor.classes = []
+	internal.leave.group.on.close = true
+	internal.throw.on.fetch.stable.offset.unsupported = false
+	isolation.level = read_uncommitted
+	key.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+	max.partition.fetch.bytes = 1048576
+	max.poll.interval.ms = 300000
+	max.poll.records = 500
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.recording.level = INFO
+	metrics.sample.window.ms = 30000
+	partition.assignment.strategy = [class org.apache.kafka.clients.consumer.RangeAssignor]
+	receive.buffer.bytes = 65536
+	reconnect.backoff.max.ms = 1000
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retry.backoff.ms = 100
+	sasl.client.callback.handler.class = null
+	sasl.jaas.config = null
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.login.callback.handler.class = null
+	sasl.login.class = null
+	sasl.login.refresh.buffer.seconds = 300
+	sasl.login.refresh.min.period.seconds = 60
+	sasl.login.refresh.window.factor = 0.8
+	sasl.login.refresh.window.jitter = 0.05
+	sasl.mechanism = GSSAPI
+	security.protocol = PLAINTEXT
+	security.providers = null
+	send.buffer.bytes = 131072
+	session.timeout.ms = 10000
+	socket.connection.setup.timeout.max.ms = 127000
+	socket.connection.setup.timeout.ms = 10000
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.3]
+	ssl.endpoint.identification.algorithm = https
+	ssl.engine.factory.class = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.certificate.chain = null
+	ssl.keystore.key = null
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLSv1.3
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.certificates = null
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	value.deserializer = class org.apache.kafka.common.serialization.StringDeserializer
+
+21:35:55,057 INFO Kafka version: 2.7.0
+21:35:55,057 INFO Kafka commitId: 448719dc99a19793
+21:35:55,057 INFO Kafka startTimeMs: 1620416155054
+21:35:55,060 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Subscribed to topic(s): step9
+21:35:55,321 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Cluster ID: viINCiUETT6O1COzC7a5ow
+21:35:55,322 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Discovered group coordinator pawes-macbook-pro.home:9092 (id: 2147483647 rack: null)
+21:35:55,326 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] (Re-)joining group
+21:35:55,338 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] (Re-)joining group
+21:35:55,341 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Successfully joined group with generation Generation{generationId=1, memberId='consumer-step5_d990d43-1-0cf0ed0a-7e0a-4469-9da7-5cd428d72666', protocol='range'}
+21:35:55,342 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Finished assignment for group at generation 1: {consumer-step5_d990d43-1-0cf0ed0a-7e0a-4469-9da7-5cd428d72666=Assignment(partitions=[step9-0])}
+21:35:55,347 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Successfully synced group in generation Generation{generationId=1, memberId='consumer-step5_d990d43-1-0cf0ed0a-7e0a-4469-9da7-5cd428d72666', protocol='range'}
+21:35:55,348 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Notifying assignor about the new Assignment(partitions=[step9-0])
+21:35:55,349 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Adding newly assigned partitions: step9-0
+21:35:55,356 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Found no committed offset for partition step9-0
+21:35:55,367 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Resetting offset for partition step9-0 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[pawes-macbook-pro.home:9092 (id: 0 rack: null)], epoch=0}}.
+Duplicate on item 280. random message
+21:35:57,760 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Revoke previously assigned partitions step9-0
+21:35:57,760 INFO [Consumer clientId=consumer-step5_d990d43-1, groupId=step5_d990d43] Member consumer-step5_d990d43-1-0cf0ed0a-7e0a-4469-9da7-5cd428d72666 sending LeaveGroup request to coordinator pawes-macbook-pro.home:9092 (id: 2147483647 rack: null) due to the consumer is being closed
+21:35:57,763 INFO Metrics scheduler closed
+21:35:57,763 INFO Closing reporter org.apache.kafka.common.metrics.JmxReporter
+21:35:57,763 INFO Metrics reporters closed
+21:35:57,770 INFO App info kafka.consumer for consumer-step5_d990d43-1 unregistered
