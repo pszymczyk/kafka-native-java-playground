@@ -1,20 +1,15 @@
 package com.pszymczyk.step6;
 
-import com.pszymczyk.FirstLevelCacheBackedByKafka;
-import com.pszymczyk.SimpleKafkaProducer;
-import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class Step6Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(FirstLevelCacheBackedByKafka.class);
+    protected static Logger logger = LoggerFactory.getLogger(Step6Runner.class);
 
     public static void main(String[] args) throws InterruptedException {
         String topic = "step6";

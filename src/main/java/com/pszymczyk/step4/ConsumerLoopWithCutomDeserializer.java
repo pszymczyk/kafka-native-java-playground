@@ -1,4 +1,4 @@
-package com.pszymczyk;
+package com.pszymczyk.step4;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -13,29 +13,28 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 
-import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 
-public class FirstLevelCacheBackedByKafka implements Runnable {
+public class ConsumerLoopWithCutomDeserializer implements Runnable {
+
+    protected static Logger logger = LoggerFactory.getLogger(ConsumerLoopWithCutomDeserializer.class);
 
     private final KafkaConsumer<String, String> consumer;
+    private final int id;
     private final String topic;
 
-    private final Map<String, String> cache = new HashMap<>();
-
-    public FirstLevelCacheBackedByKafka(String topic) {
+    public ConsumerLoopWithCutomDeserializer(int id, String groupId, String topic) {
+        this.id = id;
         this.topic = topic;
         Properties props = new Properties();
         props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(GROUP_ID_CONFIG, "step5_"+ UUID.randomUUID().toString().substring(0, 7));
+        props.put(GROUP_ID_CONFIG, groupId);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, CustomDeserializer.class.getName());
         this.consumer = new KafkaConsumer<>(props);
     }
 
@@ -47,7 +46,11 @@ public class FirstLevelCacheBackedByKafka implements Runnable {
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (ConsumerRecord<String, String> record : records) {
-                    cache.put(record.key(), record.value());
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("partition", record.partition());
+                    data.put("offset", record.offset());
+                    data.put("value", record.value());
+                    logger.info(this.id + ": " + data);
                 }
             }
         } catch (WakeupException e) {
@@ -57,12 +60,7 @@ public class FirstLevelCacheBackedByKafka implements Runnable {
         }
     }
 
-
     public void shutdown() {
         consumer.wakeup();
-    }
-
-    public Map<String, String> getCachedItems() {
-        return cache;
     }
 }

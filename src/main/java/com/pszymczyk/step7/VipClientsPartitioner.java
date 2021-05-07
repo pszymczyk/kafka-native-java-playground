@@ -1,4 +1,4 @@
-package com.pszymczyk;
+package com.pszymczyk.step7;
 
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;

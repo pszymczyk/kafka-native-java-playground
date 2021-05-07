@@ -1,5 +1,6 @@
-package com.pszymczyk;
+package com.pszymczyk.step6;
 
+import com.pszymczyk.ConsumerLoop;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;

@@ -1,8 +1,5 @@
 package com.pszymczyk.step4;
 
-import com.pszymczyk.ConsumerLoop;
-import com.pszymczyk.ConsumerLoopWithCutomDeserializer;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;

@@ -1,19 +1,14 @@
 package com.pszymczyk.step7;
 
-import com.pszymczyk.FirstLevelCacheBackedByKafka;
-import com.pszymczyk.SimpleKafkaProducer;
-import com.pszymczyk.SimpleKafkaProducerWithCustomPartioner;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class Step7Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(FirstLevelCacheBackedByKafka.class);
+    protected static Logger logger = LoggerFactory.getLogger(Step7Runner.class);
 
     public static void main(String[] args) {
         String topic = "step7";
