@@ -1,6 +1,5 @@
 package com.pszymczyk.step8;
 
-import com.pszymczyk.step7.SimpleKafkaProducerWithCustomPartioner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
