@@ -23,7 +23,7 @@ public class ConsumerLoopWithCutomDeserializer implements Runnable {
 
     protected static Logger logger = LoggerFactory.getLogger(ConsumerLoopWithCutomDeserializer.class);
 
-    private final KafkaConsumer<String, String> consumer;
+    private final KafkaConsumer<String, Customer> consumer;
     private final int id;
     private final String topic;
 
@@ -44,8 +44,8 @@ public class ConsumerLoopWithCutomDeserializer implements Runnable {
             consumer.subscribe(Arrays.asList(topic));
 
             while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                for (ConsumerRecord<String, String> record : records) {
+                ConsumerRecords<String, Customer> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                for (ConsumerRecord<String, Customer> record : records) {
                     Map<String, Object> data = new HashMap<>();
                     data.put("partition", record.partition());
                     data.put("offset", record.offset());
