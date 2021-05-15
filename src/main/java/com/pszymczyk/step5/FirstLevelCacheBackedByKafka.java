@@ -30,24 +30,17 @@ public class FirstLevelCacheBackedByKafka implements Runnable {
         this.topic = topic;
         Properties props = new Properties();
         props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(GROUP_ID_CONFIG, "step5_"+ UUID.randomUUID().toString().substring(0, 7));
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(AUTO_OFFSET_RESET_CONFIG, "earliest");
         this.consumer = new KafkaConsumer<>(props);
+        throw new RuntimeException("Not implemented");
+
     }
 
     @Override
     public void run() {
         try {
-            consumer.subscribe(Arrays.asList(topic));
-
-            while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                for (ConsumerRecord<String, String> record : records) {
-                    cache.put(record.key(), record.value());
-                }
-            }
+            throw new RuntimeException("Not implemented");
         } catch (WakeupException e) {
             // ignore for shutdown
         } finally {
