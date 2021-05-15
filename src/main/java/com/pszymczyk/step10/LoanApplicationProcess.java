@@ -75,12 +75,6 @@ public class LoanApplicationProcess implements Runnable {
                             producer.send(outputRecord);
                         }
                         producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), groupId);
-                        Random rand = new Random();
-                        int randomNum = rand.nextInt((4 - 1) + 1) + 1;
-                        System.err.println(randomNum);
-                        if (randomNum == 2) {
-                            throw new Exception();
-                        }
                         producer.commitTransaction();
                     } catch (Exception e) {
                         producer.abortTransaction();
