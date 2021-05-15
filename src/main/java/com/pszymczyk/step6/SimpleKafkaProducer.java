@@ -32,31 +32,14 @@ public class SimpleKafkaProducer {
     }
 
     public void sendAndForget(String messageValue) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, messageValue);
-        try {
-            kafkaProducer.send(record);
-        } catch (Exception e) {
-            logger.warn("Exception while sending message in send and forget mode", e);
-        }
+        throw new RuntimeException("Not implemented");
     }
 
     public RecordMetadata syncSend(String messageValue, long timeout, TimeUnit timeUnit) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, messageValue);
-        try {
-            return kafkaProducer.send(record).get(timeout, timeUnit);
-        } catch (Exception e) {
-            logger.error("Exception while sending message in sync mode", e);
-            return null;
-        }
+        throw new RuntimeException("Not implemented");
     }
 
     public Future<RecordMetadata> asyncSend(String messageValue, Callback callback) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, messageValue);
-        try {
-            return kafkaProducer.send(record, callback);
-        } catch (Exception e) {
-            logger.error("Exception while sending message in sync mode", e);
-            return CompletableFuture.completedFuture(null);
-        }
+        throw new RuntimeException("Not implemented");
     }
 }
