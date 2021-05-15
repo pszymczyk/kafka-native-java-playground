@@ -23,9 +23,10 @@ public class SimpleKafkaProducerWithSerializer {
         Properties producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, MetadataEnrichSerializer.class);
+        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, null);
         this.kafkaProducer = new KafkaProducer<>(producerProperties);
         this.topic = topic;
+        throw new RuntimeException("not implemented");
     }
 
     public RecordMetadata syncSend(String messageValue, long timeout, TimeUnit timeUnit) {

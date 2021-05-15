@@ -22,9 +22,7 @@ public class MetadataEnrichSerializer implements Serializer<String> {
 
     @Override
     public byte[] serialize(String topic, Headers headers, String data) {
-        headers.add(new RecordHeader("local_time", LocalDateTime.now(ZoneId.of("Canada/Yukon")).toString().getBytes(StandardCharsets.UTF_8)));
-        headers.add(new RecordHeader("source", "Step8_microservice".getBytes(StandardCharsets.UTF_8)));
-        return Serializer.super.serialize(topic, headers, data);
+        throw new RuntimeException("not implemented");
     }
 
     @Override
