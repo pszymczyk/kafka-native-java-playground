@@ -62,34 +62,8 @@ public class LoanApplicationProcess implements Runnable {
 
     @Override
     public void run() {
-        producer.initTransactions();
         try {
-            consumer.subscribe(Arrays.asList(loanApplicationRequestsTopic));
-            while (true) {
-                ConsumerRecords<String, LoanApplicationRequest> loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                if (!loanApplicationRequests.isEmpty()) {
-                    producer.beginTransaction();
-                    try {
-                        List<ProducerRecord<String, LoanApplicationDecision>> outputRecords = processApplications(loanApplicationRequests);
-                        for (ProducerRecord<String, LoanApplicationDecision> outputRecord : outputRecords) {
-                            producer.send(outputRecord);
-                        }
-                        producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), groupId);
-                        Random rand = new Random();
-                        int randomNum = rand.nextInt((4 - 1) + 1) + 1;
-                        System.err.println(randomNum);
-                        if (randomNum == 2) {
-                            throw new Exception();
-                        }
-                        producer.commitTransaction();
-                    } catch (Exception e) {
-                        producer.abortTransaction();
-                        continue;
-                    }
-
-                }
-
-            }
+            throw new RuntimeException("not implemented");
         } catch (WakeupException e) {
             // ignore for shutdown
         } finally {
