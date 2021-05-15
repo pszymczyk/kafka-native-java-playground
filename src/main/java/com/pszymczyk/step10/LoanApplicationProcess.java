@@ -78,7 +78,6 @@ public class LoanApplicationProcess implements Runnable {
                         producer.commitTransaction();
                     } catch (Exception e) {
                         producer.abortTransaction();
-                        continue;
                     }
 
                 }
