@@ -5,7 +5,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -40,7 +39,7 @@ public class LoanApplicationProcess implements AutoCloseable {
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         this.consumer = new KafkaConsumer<>(consumerProperties);
 
-        Properties producerProperties = new Properties();
+        var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, LoanApplicationDecisionSerializer.class.getName());
@@ -52,31 +51,22 @@ public class LoanApplicationProcess implements AutoCloseable {
 
     public void start() {
         producer.initTransactions();
-        try {
-            consumer.subscribe(Arrays.asList(loanApplicationRequestsTopic));
-            while (true) {
-                ConsumerRecords<String, LoanApplicationRequest> loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                if (!loanApplicationRequests.isEmpty()) {
-                    producer.beginTransaction();
-                    try {
-                        List<ProducerRecord<String, LoanApplicationDecision>> outputRecords = processApplications(loanApplicationRequests);
-                        for (ProducerRecord<String, LoanApplicationDecision> outputRecord : outputRecords) {
-                            producer.send(outputRecord);
-                        }
-                        producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), groupId);
-                        producer.commitTransaction();
-                    } catch (Exception e) {
-                        producer.abortTransaction();
+        consumer.subscribe(List.of(loanApplicationRequestsTopic));
+        while (true) {
+            var loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+            if (!loanApplicationRequests.isEmpty()) {
+                producer.beginTransaction();
+                try {
+                    var outputRecords = processApplications(loanApplicationRequests);
+                    for (var outputRecord : outputRecords) {
+                        producer.send(outputRecord);
                     }
-
+                    producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), new ConsumerGroupMetadata(groupId));
+                    producer.commitTransaction();
+                } catch (Exception e) {
+                    producer.abortTransaction();
                 }
-
             }
-        } catch (WakeupException e) {
-            // ignore for shutdown
-        } finally {
-            consumer.close();
-            producer.close();
         }
     }
 
@@ -96,7 +86,7 @@ public class LoanApplicationProcess implements AutoCloseable {
             LoanApplicationRequest loanApplicationRequest = loanApplicationRequestConsumerRecord.value();
             if (debtorsRepository.getDebtors().contains(loanApplicationRequest.getRequester())) {
                 submitDecision(loanApplicationDecisions, loanApplicationRequest.getAmount().multiply(new BigDecimal("0.5")),
-                    loanApplicationRequest.getRequester());
+                        loanApplicationRequest.getRequester());
             } else if (debtorsRepository.getBlackList().contains(loanApplicationRequest.getRequester())) {
                 submitDecision(loanApplicationDecisions, BigDecimal.ZERO, loanApplicationRequest.getRequester());
             } else {
@@ -114,7 +104,7 @@ public class LoanApplicationProcess implements AutoCloseable {
         loanApplicationDecision.setAmount(amount);
         loanApplicationDecision.setRequester(requester);
         ProducerRecord<String, LoanApplicationDecision> loanApplicationDecisionProducerRecord = new ProducerRecord<>(loanApplicationDecisionsTopic,
-            loanApplicationDecision);
+                loanApplicationDecision);
         loanApplicationDecisions.add(loanApplicationDecisionProducerRecord);
     }
 
