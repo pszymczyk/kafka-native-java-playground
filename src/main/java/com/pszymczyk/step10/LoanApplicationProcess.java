@@ -73,16 +73,6 @@ public class LoanApplicationProcess implements AutoCloseable {
         }
     }
 
-    private Map<TopicPartition, OffsetAndMetadata> getUncommittedOffsets(ConsumerRecords<String, LoanApplicationRequest> records) {
-        var offsetsToCommit = new HashMap<TopicPartition, OffsetAndMetadata>();
-        for (var partition : records.partitions()) {
-            var partitionedRecords = records.records(partition);
-            var offset = partitionedRecords.get(partitionedRecords.size() - 1).offset();
-            offsetsToCommit.put(partition, new OffsetAndMetadata(offset + 1));
-        }
-        return offsetsToCommit;
-    }
-
     private List<LoanApplicationDecision> processApplications(List<LoanApplicationRequest> loanApplicationRequests) {
         var loanApplicationDecisions = new ArrayList<LoanApplicationDecision>();
         for (var loanApplicationRequest : loanApplicationRequests) {
@@ -107,6 +97,15 @@ public class LoanApplicationProcess implements AutoCloseable {
         loanApplicationDecisions.add(loanApplicationDecision);
     }
 
+    private Map<TopicPartition, OffsetAndMetadata> getUncommittedOffsets(ConsumerRecords<String, LoanApplicationRequest> records) {
+        var offsetsToCommit = new HashMap<TopicPartition, OffsetAndMetadata>();
+        for (var partition : records.partitions()) {
+            var partitionedRecords = records.records(partition);
+            var offset = partitionedRecords.get(partitionedRecords.size() - 1).offset();
+            offsetsToCommit.put(partition, new OffsetAndMetadata(offset + 1));
+        }
+        return offsetsToCommit;
+    }
 
     @Override
     public void close() {
