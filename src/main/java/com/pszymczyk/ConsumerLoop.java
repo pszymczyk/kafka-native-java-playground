@@ -43,7 +43,7 @@ public class ConsumerLoop implements AutoCloseable {
         consumer.subscribe(List.of(topic));
 
         while (true) {
-            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+            var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
             for (ConsumerRecord<String, String> record : records) {
                 Map<String, Object> data = new HashMap<>();
                 data.put("partition", record.partition());
