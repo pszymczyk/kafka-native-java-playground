@@ -11,18 +11,19 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class SimpleKafkaProducerWithSerializer {
+public class SimpleKafkaProducerWithInterceptor {
 
-    protected static Logger logger = LoggerFactory.getLogger(SimpleKafkaProducerWithSerializer.class);
+    protected static Logger logger = LoggerFactory.getLogger(SimpleKafkaProducerWithInterceptor.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;
 
-    public SimpleKafkaProducerWithSerializer(String topic) {
+    public SimpleKafkaProducerWithInterceptor(String topic) {
         Properties producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, MetadataEnrichSerializer.class);
+        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        producerProperties.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, MetadataEnrichmentInterceptor.class.getName());
         this.kafkaProducer = new KafkaProducer<>(producerProperties);
         this.topic = topic;
     }
