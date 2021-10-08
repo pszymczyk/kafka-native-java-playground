@@ -7,7 +7,7 @@ public class Step1Runner {
     public static void main(String[] args) {
         var groupId = "step1";
         var topic = "step1";
-        try (var consumer = new ConsumerLoop( groupId, topic)) {
+        try (var consumer = new ConsumerLoop(groupId, topic)) {
             consumer.start();
         }
     }
