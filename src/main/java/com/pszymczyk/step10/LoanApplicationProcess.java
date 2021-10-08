@@ -62,8 +62,8 @@ public class LoanApplicationProcess implements AutoCloseable {
             producer.beginTransaction();
             try {
                 var loanApplicationDecisions = processApplications(loanApplicationRequests);
-                for (var outputRecord : loanApplicationDecisions) {
-                    producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, outputRecord));
+                for (var loanApplicationDecision : loanApplicationDecisions) {
+                    producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
                 }
                 producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequestsRecords), new ConsumerGroupMetadata(groupId));
                 producer.commitTransaction();
