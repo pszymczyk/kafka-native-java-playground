@@ -57,6 +57,7 @@ public class ConsumerLoopManualCommit implements AutoCloseable {
                             new TopicPartition(topic, partitionAndOffset.getKey()),
                             //The committed offset should always be the offset of the next message that your application will read
                             new OffsetAndMetadata(partitionAndOffset.getValue() + 1));
+                    logger.info("Commit offset {} on partition {}", partitionAndOffset.getValue()+1, partitionAndOffset.getKey());
                     consumer.commitSync(offsetToCommit);
                 }
             }
