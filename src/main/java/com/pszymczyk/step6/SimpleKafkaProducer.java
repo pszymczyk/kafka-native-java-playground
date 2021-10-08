@@ -1,11 +1,6 @@
 package com.pszymczyk.step6;
 
-import com.pszymczyk.ConsumerLoop;
-import org.apache.kafka.clients.producer.Callback;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SimpleKafkaProducer {
 
-    protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
+    protected static Logger logger = LoggerFactory.getLogger(SimpleKafkaProducer.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;

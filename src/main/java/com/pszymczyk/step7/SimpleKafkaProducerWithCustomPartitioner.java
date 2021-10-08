@@ -1,6 +1,5 @@
 package com.pszymczyk.step7;
 
-import com.pszymczyk.ConsumerLoop;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,14 +11,14 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class SimpleKafkaProducerWithCustomPartioner {
+public class SimpleKafkaProducerWithCustomPartitioner {
 
-    protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
+    protected static Logger logger = LoggerFactory.getLogger(SimpleKafkaProducerWithCustomPartitioner.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;
 
-    public SimpleKafkaProducerWithCustomPartioner(String topic) {
+    public SimpleKafkaProducerWithCustomPartitioner(String topic) {
         Properties producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);

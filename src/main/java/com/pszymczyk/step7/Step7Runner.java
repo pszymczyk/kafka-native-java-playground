@@ -12,7 +12,7 @@ public class Step7Runner {
 
     public static void main(String[] args) {
         String topic = "step7";
-        SimpleKafkaProducerWithCustomPartioner simpleKafkaProducer = new SimpleKafkaProducerWithCustomPartioner(topic);
+        SimpleKafkaProducerWithCustomPartitioner simpleKafkaProducer = new SimpleKafkaProducerWithCustomPartitioner(topic);
 
         simpleKafkaProducer.syncSend("vip", "Vip message " + UUID.randomUUID(), 5, TimeUnit.SECONDS);
         simpleKafkaProducer.syncSend("VIP", "Vip message " + UUID.randomUUID(), 5, TimeUnit.SECONDS);

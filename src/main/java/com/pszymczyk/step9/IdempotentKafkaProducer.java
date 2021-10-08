@@ -1,6 +1,5 @@
 package com.pszymczyk.step9;
 
-import com.pszymczyk.ConsumerLoop;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -13,7 +12,7 @@ import java.util.Properties;
 
 public class IdempotentKafkaProducer {
 
-    protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
+    protected static Logger logger = LoggerFactory.getLogger(IdempotentKafkaProducer.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;

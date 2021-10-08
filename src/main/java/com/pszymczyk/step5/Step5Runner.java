@@ -3,35 +3,25 @@ package com.pszymczyk.step5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public class Step5Runner {
 
     protected static Logger logger = LoggerFactory.getLogger(Step5Runner.class);
 
     public static void main(String[] args) {
-        String topic = "step5";
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        FirstLevelCacheBackedByKafka firstLevelCacheBackedByKafka = new FirstLevelCacheBackedByKafka(topic);
-        executor.submit(firstLevelCacheBackedByKafka);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            firstLevelCacheBackedByKafka.shutdown();
-            executor.shutdown();
-            try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        var topic = "step5";
+        var executor = Executors.newFixedThreadPool(3);
+        executor.submit(() -> {
+            try (var firstLevelCacheByKafka = new FirstLevelCacheBackedByKafka(topic)){
+                firstLevelCacheByKafka.start();
             }
-        }));
+        });
 
         while (true) {
-            logger.info("Cached items:");
-            logger.info(""+firstLevelCacheBackedByKafka.getCachedItems());
+            logger.info("Cache: {}",FirstLevelCacheBackedByKafka.getCachedItems());
             try {
-                Thread.sleep(5000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

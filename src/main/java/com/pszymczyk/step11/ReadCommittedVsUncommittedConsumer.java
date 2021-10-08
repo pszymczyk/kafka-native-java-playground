@@ -1,6 +1,5 @@
 package com.pszymczyk.step11;
 
-import com.pszymczyk.ConsumerLoop;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -19,11 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.ISOLATION_LEVEL_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
-import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
 public class ReadCommittedVsUncommittedConsumer {
 
@@ -94,7 +89,7 @@ public class ReadCommittedVsUncommittedConsumer {
 
     static public class ReadUncommitted implements Runnable {
 
-        protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
+        protected static Logger logger = LoggerFactory.getLogger(ReadUncommitted.class);
 
         private final KafkaConsumer<String, String> consumer;
         private final String topic;

@@ -1,35 +1,33 @@
 package com.pszymczyk.step3;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Executors;
+
+@SuppressWarnings("Duplicates")
 public class Step3Runner {
 
-    public static void main(String[] args) {
-        int numConsumers = 3;
-        String groupId = "step3";
-        String topic = "step3";
-        ExecutorService executor = Executors.newFixedThreadPool(3);
-        final List<ConsumerLoopManualCommit> consumers = new ArrayList<>();
-        for (int i = 0; i < numConsumers; i++) {
-            ConsumerLoopManualCommit consumer = new ConsumerLoopManualCommit(i, groupId, topic);
-            consumers.add(consumer);
-            executor.submit(consumer);
-        }
+    private static final Logger logger = LoggerFactory.getLogger(Step3Runner.class);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ConsumerLoopManualCommit consumer : consumers) {
-                consumer.shutdown();
+    public static void main(String[] args) {
+        var groupId = "step3";
+        var topic = "step3";
+        var executor = Executors.newFixedThreadPool(3);
+        executor.submit(() -> {
+            try (var consumerLoop = new ConsumerLoopManualCommit(0, groupId, topic)) {
+                consumerLoop.start();
             }
-            executor.shutdown();
-            try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        });
+        executor.submit(() -> {
+            try (var consumerLoop = new ConsumerLoopManualCommit(1, groupId, topic)) {
+                consumerLoop.start();
             }
-        }));
+        });
+        executor.submit(() -> {
+            try (var consumerLoop = new ConsumerLoopManualCommit(2, groupId, topic)) {
+                consumerLoop.start();
+            }
+        });
     }
 }

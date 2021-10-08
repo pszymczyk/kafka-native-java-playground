@@ -1,37 +1,35 @@
 package com.pszymczyk.step2;
 
 import com.pszymczyk.ConsumerLoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("Duplicates")
 public class Step2Runner {
 
-    public static void main(String[] args) {
-        int numConsumers = 3;
-        String groupId = "step2";
-        String topic = "step2";
-        ExecutorService executor = Executors.newFixedThreadPool(3);
-        final List<ConsumerLoop> consumers = new ArrayList<>();
-        for (int i = 0; i < numConsumers; i++) {
-            ConsumerLoop consumer = new ConsumerLoop(i, groupId, topic);
-            consumers.add(consumer);
-            executor.submit(consumer);
-        }
+    private static final Logger logger = LoggerFactory.getLogger(Step2Runner.class);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            for (ConsumerLoop consumer : consumers) {
-                consumer.shutdown();
+    public static void main(String[] args) {
+        var groupId = "step2";
+        var topic = "step2";
+
+        var executor = Executors.newFixedThreadPool(3);
+        executor.submit(() -> {
+            try (var consumerLoop = new ConsumerLoop(0, groupId, topic)) {
+                consumerLoop.start();
             }
-            executor.shutdown();
-            try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        });
+        executor.submit(() -> {
+            try (var consumerLoop = new ConsumerLoop(1, groupId, topic)) {
+                consumerLoop.start();
             }
-        }));
+        });
+        executor.submit(() -> {
+            try (var consumerLoop = new ConsumerLoop(2, groupId, topic)) {
+                consumerLoop.start();
+            }
+        });
     }
 }

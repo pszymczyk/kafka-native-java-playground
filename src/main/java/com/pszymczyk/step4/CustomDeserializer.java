@@ -7,18 +7,16 @@ import org.slf4j.LoggerFactory;
 
 public class CustomDeserializer implements Deserializer<Customer> {
 
-    private static Logger logger = LoggerFactory.getLogger(CustomDeserializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(CustomDeserializer.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Customer deserialize(String topic, byte[] data) {
         try {
-            Customer customer = objectMapper.readValue(data, Customer.class);
-            return customer;
+            return objectMapper.readValue(data, Customer.class);
         } catch (Exception e) {
-            logger.error("cannot deserialize customer", e);
+            logger.error("Cannot deserialize given data {} to {}", new String(data), Customer.class, e);
             return null;
         }
     }
-
 }
