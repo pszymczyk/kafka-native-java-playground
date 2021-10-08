@@ -38,7 +38,7 @@ public class ConsumerLoopManualCommit implements AutoCloseable {
     public void start() {
         consumer.subscribe(List.of(topic));
 
-        Map<Integer, Long> lastConsumedOffsetsOnPartitions = new HashMap<>();
+        var lastConsumedOffsetsOnPartitions = new HashMap<Integer, Long>();
 
         while (true) {
             var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
@@ -65,6 +65,6 @@ public class ConsumerLoopManualCommit implements AutoCloseable {
 
     @Override
     public void close() {
-        consumer.wakeup();
+        consumer.close();
     }
 }

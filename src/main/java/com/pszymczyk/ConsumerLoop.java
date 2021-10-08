@@ -31,7 +31,7 @@ public class ConsumerLoop implements AutoCloseable {
     public ConsumerLoop(int id, String groupId, String topic) {
         this.id = id;
         this.topic = topic;
-        Properties props = new Properties();
+        var props = new Properties();
         props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(GROUP_ID_CONFIG, groupId);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());

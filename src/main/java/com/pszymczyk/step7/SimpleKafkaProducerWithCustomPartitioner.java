@@ -19,7 +19,7 @@ public class SimpleKafkaProducerWithCustomPartitioner {
     private final String topic;
 
     public SimpleKafkaProducerWithCustomPartitioner(String topic) {
-        Properties producerProperties = new Properties();
+        var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -29,7 +29,7 @@ public class SimpleKafkaProducerWithCustomPartitioner {
     }
 
     public RecordMetadata syncSend(String key, String messageValue, long timeout, TimeUnit timeUnit) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, messageValue);
+        var record = new ProducerRecord<>(topic, key, messageValue);
         try {
             return kafkaProducer.send(record).get(timeout, timeUnit);
         } catch (Exception e) {

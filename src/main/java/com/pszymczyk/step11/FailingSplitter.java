@@ -6,7 +6,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
-import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -32,7 +31,7 @@ public class FailingSplitter implements Runnable {
         this.loanApplicationDecisionsTopic = loanApplicationDecisionsTopic;
         this.groupId = groupId;
 
-        Properties consumerProperties = new Properties();
+        var consumerProperties = new Properties();
         consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -41,64 +40,52 @@ public class FailingSplitter implements Runnable {
         consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         this.consumer = new KafkaConsumer<>(consumerProperties);
 
-        Properties producerProperties = new Properties();
+        var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProperties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
         producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "rental_car_process_1");
         this.producer = new KafkaProducer<>(producerProperties);
-
     }
 
     @Override
     public void run() {
         producer.initTransactions();
-        try {
-            consumer.subscribe(Arrays.asList(loanApplicationRequestsTopic));
-            while (true) {
-                ConsumerRecords<String, String> loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                if (!loanApplicationRequests.isEmpty()) {
-                    producer.beginTransaction();
-                    try {
-                        List<ProducerRecord<String, String>> outputRecords = processApplications(loanApplicationRequests);
-                        for (ProducerRecord<String, String> outputRecord : outputRecords) {
-                            producer.send(outputRecord);
-                        }
-                        producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), groupId);
-
-                        failSometimes();
-
-                        producer.commitTransaction();
-                    } catch (Exception e) {
-                        producer.abortTransaction();
-                        continue;
-                    }
-
+        consumer.subscribe(List.of(loanApplicationRequestsTopic));
+        while (true) {
+            var loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+            producer.beginTransaction();
+            try {
+                List<ProducerRecord<String, String>> outputRecords = processApplications(loanApplicationRequests);
+                for (ProducerRecord<String, String> outputRecord : outputRecords) {
+                    producer.send(outputRecord);
                 }
+                producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), new ConsumerGroupMetadata(groupId));
 
+                failSometimes();
+
+                producer.commitTransaction();
+            } catch (Exception e) {
+                logger.error("Exception during transaction!", e);
+                producer.abortTransaction();
             }
-        } catch (WakeupException e) {
-            // ignore for shutdown
-        } finally {
-            consumer.close();
-            producer.close();
         }
     }
 
     private void failSometimes() throws Exception {
         Random rand = new Random();
-        int randomNum = rand.nextInt((4 - 1) + 1) + 1;
+        int randomNum = rand.nextInt((3 - 1) + 1) + 1;
         logger.info("Random number: {}", randomNum);
         if (randomNum == 2) {
-            throw new Exception();
+            throw new Exception("Random number 2 = exception!");
         }
     }
 
     private Map<TopicPartition, OffsetAndMetadata> getUncommittedOffsets(ConsumerRecords<String, String> records) {
-        Map<TopicPartition, OffsetAndMetadata> offsetsToCommit = new HashMap<>();
+        var offsetsToCommit = new HashMap<TopicPartition, OffsetAndMetadata>();
         for (TopicPartition partition : records.partitions()) {
-            List<ConsumerRecord<String, String>> partitionedRecords = records.records(partition);
+            var partitionedRecords = records.records(partition);
             long offset = partitionedRecords.get(partitionedRecords.size() - 1).offset();
             offsetsToCommit.put(partition, new OffsetAndMetadata(offset + 1));
         }
@@ -106,9 +93,9 @@ public class FailingSplitter implements Runnable {
     }
 
     private List<ProducerRecord<String, String>> processApplications(ConsumerRecords<String, String> loanApplicationRequests) {
-        List<ProducerRecord<String, String>> producerRecords = new ArrayList<>();
-        for (ConsumerRecord<String, String> record : loanApplicationRequests) {
-            for (String singleChar: record.value().split("\\.")) {
+        var producerRecords = new ArrayList<ProducerRecord<String, String>>();
+        for (var record : loanApplicationRequests) {
+            for (var singleChar : record.value().split("\\.")) {
                 ProducerRecord<String, String> loanApplicationDecisionProducerRecord = new ProducerRecord<>(loanApplicationDecisionsTopic, singleChar);
                 producerRecords.add(loanApplicationDecisionProducerRecord);
             }
@@ -118,6 +105,7 @@ public class FailingSplitter implements Runnable {
     }
 
     public void shutdown() {
-        consumer.wakeup();
+        producer.close();
+        consumer.close();
     }
 }

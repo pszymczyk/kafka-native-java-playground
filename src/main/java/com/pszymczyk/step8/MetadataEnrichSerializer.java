@@ -29,6 +29,5 @@ public class MetadataEnrichSerializer implements Serializer<String> {
 
     @Override
     public void close() {
-        Serializer.super.close();
     }
 }

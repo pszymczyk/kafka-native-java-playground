@@ -18,7 +18,7 @@ public class IdempotentKafkaProducer {
     private final String topic;
 
     public IdempotentKafkaProducer(String topic) {
-        Properties producerProperties = new Properties();
+        var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -29,7 +29,7 @@ public class IdempotentKafkaProducer {
     }
 
     public void asyncSend(String messageValue) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, messageValue);
+        var record = new ProducerRecord<String, String>(topic, messageValue);
         Callback callback = (metadata, exception) -> logger.info("Message sent completed, record metadata: {}, exception: ", metadata, exception);
         try {
             kafkaProducer.send(record, callback);

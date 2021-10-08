@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.util.*;
 
 
-public class LoanApplicationProcess implements Runnable {
+public class LoanApplicationProcess implements AutoCloseable {
 
     private final KafkaConsumer<String, LoanApplicationRequest> consumer;
     private final KafkaProducer<String, LoanApplicationDecision> producer;
@@ -31,7 +31,7 @@ public class LoanApplicationProcess implements Runnable {
         this.groupId = groupId;
         this.debtorsRepository = debtorsRepository;
 
-        Properties consumerProperties = new Properties();
+        var consumerProperties = new Properties();
         consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -50,8 +50,7 @@ public class LoanApplicationProcess implements Runnable {
 
     }
 
-    @Override
-    public void run() {
+    public void start() {
         producer.initTransactions();
         try {
             consumer.subscribe(Arrays.asList(loanApplicationRequestsTopic));
@@ -120,7 +119,8 @@ public class LoanApplicationProcess implements Runnable {
     }
 
 
-    public void shutdown() {
-        consumer.wakeup();
+    @Override
+    public void close() {
+        consumer.close();
     }
 }

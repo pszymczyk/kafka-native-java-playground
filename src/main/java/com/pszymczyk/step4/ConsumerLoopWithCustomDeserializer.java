@@ -16,7 +16,7 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 @SuppressWarnings("Duplicates")
 public class ConsumerLoopWithCustomDeserializer implements AutoCloseable {
 
-    protected static Logger logger = LoggerFactory.getLogger(ConsumerLoopWithCustomDeserializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerLoopWithCustomDeserializer.class);
 
     private final KafkaConsumer<String, Customer> consumer;
     private final String topic;

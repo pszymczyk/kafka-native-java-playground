@@ -43,8 +43,6 @@ public class FirstLevelCacheBackedByKafka implements AutoCloseable {
 
     @Override
     public void close() {
-        consumer.wakeup();
+        consumer.close();
     }
-
-
 }
