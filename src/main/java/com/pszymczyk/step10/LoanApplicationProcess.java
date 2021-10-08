@@ -11,6 +11,8 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 
 public class LoanApplicationProcess implements AutoCloseable {
@@ -52,37 +54,38 @@ public class LoanApplicationProcess implements AutoCloseable {
         producer.initTransactions();
         consumer.subscribe(List.of(loanApplicationRequestsTopic));
         while (true) {
-            var loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            if (!loanApplicationRequests.isEmpty()) {
-                producer.beginTransaction();
-                try {
-                    var outputRecords = processApplications(loanApplicationRequests);
-                    for (var outputRecord : outputRecords) {
-                        producer.send(outputRecord);
-                    }
-                    producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), new ConsumerGroupMetadata(groupId));
-                    producer.commitTransaction();
-                } catch (Exception e) {
-                    producer.abortTransaction();
+            var loanApplicationRequestsRecords = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+            var loanApplicationRequests = StreamSupport.stream(loanApplicationRequestsRecords.records(loanApplicationRequestsTopic).spliterator(), false)
+                            .map(ConsumerRecord::value)
+                            .collect(Collectors.toList());
+
+            producer.beginTransaction();
+            try {
+                var loanApplicationDecisions = processApplications(loanApplicationRequests);
+                for (var outputRecord : loanApplicationDecisions) {
+                    producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, outputRecord));
                 }
+                producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequestsRecords), new ConsumerGroupMetadata(groupId));
+                producer.commitTransaction();
+            } catch (Exception e) {
+                producer.abortTransaction();
             }
         }
     }
 
     private Map<TopicPartition, OffsetAndMetadata> getUncommittedOffsets(ConsumerRecords<String, LoanApplicationRequest> records) {
-        Map<TopicPartition, OffsetAndMetadata> offsetsToCommit = new HashMap<>();
-        for (TopicPartition partition : records.partitions()) {
-            List<ConsumerRecord<String, LoanApplicationRequest>> partitionedRecords = records.records(partition);
-            long offset = partitionedRecords.get(partitionedRecords.size() - 1).offset();
+        var offsetsToCommit = new HashMap<TopicPartition, OffsetAndMetadata>();
+        for (var partition : records.partitions()) {
+            var partitionedRecords = records.records(partition);
+            var offset = partitionedRecords.get(partitionedRecords.size() - 1).offset();
             offsetsToCommit.put(partition, new OffsetAndMetadata(offset + 1));
         }
         return offsetsToCommit;
     }
 
-    private List<ProducerRecord<String, LoanApplicationDecision>> processApplications(ConsumerRecords<String, LoanApplicationRequest> loanApplicationRequests) {
-        List<ProducerRecord<String, LoanApplicationDecision>> loanApplicationDecisions = new ArrayList<>();
-        for (ConsumerRecord<String, LoanApplicationRequest> loanApplicationRequestConsumerRecord : loanApplicationRequests) {
-            LoanApplicationRequest loanApplicationRequest = loanApplicationRequestConsumerRecord.value();
+    private List<LoanApplicationDecision> processApplications(List<LoanApplicationRequest> loanApplicationRequests) {
+        var loanApplicationDecisions = new ArrayList<LoanApplicationDecision>();
+        for (var loanApplicationRequest : loanApplicationRequests) {
             if (debtorsRepository.getDebtors().contains(loanApplicationRequest.getRequester())) {
                 submitDecision(loanApplicationDecisions, loanApplicationRequest.getAmount().multiply(new BigDecimal("0.5")),
                         loanApplicationRequest.getRequester());
@@ -92,19 +95,16 @@ public class LoanApplicationProcess implements AutoCloseable {
                 submitDecision(loanApplicationDecisions, loanApplicationRequest.getAmount(), loanApplicationRequest.getRequester());
             }
         }
-
         return loanApplicationDecisions;
     }
 
-    void submitDecision(List<ProducerRecord<String, LoanApplicationDecision>> loanApplicationDecisions,
+    void submitDecision(List<LoanApplicationDecision> loanApplicationDecisions,
                         BigDecimal amount,
                         String requester) {
         LoanApplicationDecision loanApplicationDecision = new LoanApplicationDecision();
         loanApplicationDecision.setAmount(amount);
         loanApplicationDecision.setRequester(requester);
-        ProducerRecord<String, LoanApplicationDecision> loanApplicationDecisionProducerRecord = new ProducerRecord<>(loanApplicationDecisionsTopic,
-                loanApplicationDecision);
-        loanApplicationDecisions.add(loanApplicationDecisionProducerRecord);
+        loanApplicationDecisions.add(loanApplicationDecision);
     }
 
 
