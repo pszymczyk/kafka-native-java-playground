@@ -1,15 +1,11 @@
 package com.pszymczyk.step2;
 
 import com.pszymczyk.ConsumerLoop;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Executors;
 
 @SuppressWarnings("Duplicates")
 public class Step2Runner {
-
-    private static final Logger logger = LoggerFactory.getLogger(Step2Runner.class);
 
     public static void main(String[] args) {
         var groupId = "step2";
