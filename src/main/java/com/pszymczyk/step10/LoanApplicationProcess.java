@@ -51,26 +51,7 @@ public class LoanApplicationProcess implements AutoCloseable {
     }
 
     public void start() {
-        producer.initTransactions();
-        consumer.subscribe(List.of(loanApplicationRequestsTopic));
-        while (true) {
-            var loanApplicationRequestsRecords = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            var loanApplicationRequests = StreamSupport.stream(loanApplicationRequestsRecords.records(loanApplicationRequestsTopic).spliterator(), false)
-                            .map(ConsumerRecord::value)
-                            .collect(Collectors.toList());
-
-            producer.beginTransaction();
-            try {
-                var loanApplicationDecisions = processApplications(loanApplicationRequests);
-                for (var loanApplicationDecision : loanApplicationDecisions) {
-                    producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
-                }
-                producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequestsRecords), new ConsumerGroupMetadata(groupId));
-                producer.commitTransaction();
-            } catch (Exception e) {
-                producer.abortTransaction();
-            }
-        }
+        throw new RuntimeException("TODO");
     }
 
     private List<LoanApplicationDecision> processApplications(List<LoanApplicationRequest> loanApplicationRequests) {
