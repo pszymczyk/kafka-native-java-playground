@@ -41,26 +41,7 @@ public class ConsumerLoopManualCommit implements AutoCloseable {
         var lastConsumedOffsetsOnPartitions = new HashMap<Integer, Long>();
 
         while (true) {
-            var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            for (var record : records) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("partition", record.partition());
-                data.put("offset", record.offset());
-                data.put("value", record.value());
-                lastConsumedOffsetsOnPartitions.put(record.partition(), record.offset());
-                logger.info("Consumer id: {}, ConsumerRecord: {}", this.id, data);
-            }
-
-            for (var partitionAndOffset : lastConsumedOffsetsOnPartitions.entrySet()) {
-                if (partitionAndOffset.getValue() % 5 == 0) {
-                    Map<TopicPartition, OffsetAndMetadata> offsetToCommit = Map.of(
-                            new TopicPartition(topic, partitionAndOffset.getKey()),
-                            //The committed offset should always be the offset of the next message that your application will read
-                            new OffsetAndMetadata(partitionAndOffset.getValue() + 1));
-                    logger.info("Commit offset {} on partition {}", partitionAndOffset.getValue()+1, partitionAndOffset.getKey());
-                    consumer.commitSync(offsetToCommit);
-                }
-            }
+            throw new RuntimeException("Implement here!");
         }
     }
 
