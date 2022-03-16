@@ -11,18 +11,7 @@ import static java.util.Objects.requireNonNull;
 public class VipClientsPartitioner implements Partitioner {
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
-        requireNonNull(key);
-
-        if (((String) key).toLowerCase().contains("vip")) {
-            return 0;
-        } else {
-            return cluster.availablePartitionsForTopic(topic)
-                .stream()
-                .filter(partitionInfo -> partitionInfo.partition() > 0)
-                .findAny()
-                .map(PartitionInfo::partition)
-                .orElseThrow(() -> new RuntimeException("No partition available for non vip clients!"));
-        }
+        throw new RuntimeException("TODO");
     }
 
     @Override
