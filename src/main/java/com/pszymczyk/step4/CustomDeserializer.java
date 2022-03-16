@@ -12,11 +12,6 @@ public class CustomDeserializer implements Deserializer<Customer> {
 
     @Override
     public Customer deserialize(String topic, byte[] data) {
-        try {
-            return objectMapper.readValue(data, Customer.class);
-        } catch (Exception e) {
-            logger.error("Cannot deserialize given data {} to {}", new String(data), Customer.class, e);
-            return null;
-        }
+        throw new RuntimeException("TODO");
     }
 }
