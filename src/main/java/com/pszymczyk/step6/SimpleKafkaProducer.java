@@ -27,31 +27,14 @@ public class SimpleKafkaProducer {
     }
 
     public void sendAndForget(String messageValue) {
-        var record = new ProducerRecord<String, String>(topic, messageValue);
-        try {
-            kafkaProducer.send(record);
-        } catch (Exception e) {
-            logger.error("Exception while sending message in send and forget mode", e);
-        }
+        throw new RuntimeException("TODO");
     }
 
     public RecordMetadata syncSend(String messageValue, long timeout, TimeUnit timeUnit) {
-        var record = new ProducerRecord<String, String>(topic, messageValue);
-        try {
-            return kafkaProducer.send(record).get(timeout, timeUnit);
-        } catch (Exception e) {
-            logger.error("Exception while sending message in async mode", e);
-            return null;
-        }
+        throw new RuntimeException("TODO");
     }
 
     public Future<RecordMetadata> asyncSend(String messageValue, Callback callback) {
-        var record = new ProducerRecord<String, String>(topic, messageValue);
-        try {
-            return kafkaProducer.send(record, callback);
-        } catch (Exception e) {
-            logger.error("Exception while sending message in async mode", e);
-            return CompletableFuture.completedFuture(null);
-        }
+        throw new RuntimeException("TODO");
     }
 }
