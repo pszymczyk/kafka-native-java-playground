@@ -29,12 +29,7 @@ public class FirstLevelCacheBackedByKafka implements AutoCloseable {
 
     public void start() {
         consumer.subscribe(List.of(topic));
-        while (true) {
-            var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            for (ConsumerRecord<String, String> record : records) {
-                cache.put(record.key(), record.value());
-            }
-        }
+        throw new RuntimeException("TODO");
     }
 
     public static Map<String, String> getCachedItems() {
