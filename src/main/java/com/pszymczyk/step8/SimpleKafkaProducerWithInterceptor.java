@@ -23,7 +23,7 @@ public class SimpleKafkaProducerWithInterceptor {
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, MetadataEnrichmentInterceptor.class.getName());
+//        producerProperties.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, MetadataEnrichmentInterceptor.class.getName());
         this.kafkaProducer = new KafkaProducer<>(producerProperties);
         this.topic = topic;
     }
