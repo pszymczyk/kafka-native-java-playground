@@ -13,19 +13,13 @@ public class Step2Runner {
 
         var executor = Executors.newFixedThreadPool(3);
         executor.submit(() -> {
-            try (var consumerLoop = new ConsumerLoop(0, groupId, topic)) {
-                consumerLoop.start();
-            }
+            throw new RuntimeException("TODO");
         });
         executor.submit(() -> {
-            try (var consumerLoop = new ConsumerLoop(1, groupId, topic)) {
-                consumerLoop.start();
-            }
+                throw new RuntimeException("TODO");
         });
         executor.submit(() -> {
-            try (var consumerLoop = new ConsumerLoop(2, groupId, topic)) {
-                consumerLoop.start();
-            }
+            throw new RuntimeException("TODO");
         });
     }
 }
