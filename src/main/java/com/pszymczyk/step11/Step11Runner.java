@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Step11Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step11Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step11Runner.class);
 
     public static void main(String[] args) throws InterruptedException {
         String inputTopic = "step11-input";

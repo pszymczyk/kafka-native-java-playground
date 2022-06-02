@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Step6Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step6Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step6Runner.class);
 
     public static void main(String[] args) throws InterruptedException {
         var topic = "step6";

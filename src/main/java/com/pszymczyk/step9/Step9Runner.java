@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 public class Step9Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step9Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step9Runner.class);
 
     public static void main(String[] args) throws InterruptedException {
         var topic = "step9";

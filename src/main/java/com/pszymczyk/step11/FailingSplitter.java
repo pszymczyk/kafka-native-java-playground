@@ -1,7 +1,12 @@
 package com.pszymczyk.step11;
 
 
-import org.apache.kafka.clients.consumer.*;
+import com.pszymczyk.Utils;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,11 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class FailingSplitter implements Runnable {
 
-    protected static Logger logger = LoggerFactory.getLogger(FailingSplitter.class);
+    private static final Logger logger = LoggerFactory.getLogger(FailingSplitter.class);
 
     private final KafkaConsumer<String, String> consumer;
     private final KafkaProducer<String, String> producer;
@@ -63,7 +70,7 @@ public class FailingSplitter implements Runnable {
                     producer.sendOffsetsToTransaction(
                         Map.of(new TopicPartition(request.topic(), request.partition()),
                             new OffsetAndMetadata(request.offset())), new ConsumerGroupMetadata(groupId));
-                    failSometimes();
+                    Utils.failSometimes();
                     producer.commitTransaction();
                 } catch (Exception e) {
                     logger.error("Exception during transaction!", e);
@@ -72,25 +79,6 @@ public class FailingSplitter implements Runnable {
                 }
             }
         }
-    }
-
-    private void failSometimes() throws Exception {
-        Random rand = new Random();
-        int randomNum = rand.nextInt((3 - 1) + 1) + 1;
-        logger.info("Random number: {}", randomNum);
-        if (randomNum == 2) {
-            throw new Exception("Random number 2 = exception!");
-        }
-    }
-
-    private Map<TopicPartition, OffsetAndMetadata> getUncommittedOffsets(ConsumerRecords<String, String> records) {
-        var offsetsToCommit = new HashMap<TopicPartition, OffsetAndMetadata>();
-        for (TopicPartition partition : records.partitions()) {
-            var partitionedRecords = records.records(partition);
-            long offset = partitionedRecords.get(partitionedRecords.size() - 1).offset();
-            offsetsToCommit.put(partition, new OffsetAndMetadata(offset + 1));
-        }
-        return offsetsToCommit;
     }
 
     public void shutdown() {

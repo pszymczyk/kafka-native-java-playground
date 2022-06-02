@@ -5,9 +5,9 @@ import org.slf4j.LoggerFactory;
 
 public class Step10Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step10Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step10Runner.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         String inputTopic = "loan-application-requests";
         String outputTopic = "loan-application-decisions";
         String groupId = "step10";

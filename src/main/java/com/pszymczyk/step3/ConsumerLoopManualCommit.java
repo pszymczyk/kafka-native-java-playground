@@ -17,7 +17,7 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
 public class ConsumerLoopManualCommit implements AutoCloseable {
 
-    protected static Logger logger = LoggerFactory.getLogger(ConsumerLoopManualCommit.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConsumerLoopManualCommit.class);
 
     private final KafkaConsumer<String, String> consumer;
     private final int id;

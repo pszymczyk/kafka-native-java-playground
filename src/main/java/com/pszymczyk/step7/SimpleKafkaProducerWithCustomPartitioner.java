@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SimpleKafkaProducerWithCustomPartitioner {
 
-    protected static Logger logger = LoggerFactory.getLogger(SimpleKafkaProducerWithCustomPartitioner.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimpleKafkaProducerWithCustomPartitioner.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;

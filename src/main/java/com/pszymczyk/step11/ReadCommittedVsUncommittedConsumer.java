@@ -38,7 +38,7 @@ public class ReadCommittedVsUncommittedConsumer {
 
     static public class ReadCommitted implements AutoCloseable {
 
-        protected static Logger logger = LoggerFactory.getLogger(ReadCommitted.class);
+        private static final Logger logger = LoggerFactory.getLogger(ReadCommitted.class);
 
         private final KafkaConsumer<String, String> consumer;
         private final String topic;
@@ -74,7 +74,7 @@ public class ReadCommittedVsUncommittedConsumer {
 
     static public class ReadUncommitted implements AutoCloseable {
 
-        protected static Logger logger = LoggerFactory.getLogger(ReadUncommitted.class);
+        private static final Logger logger = LoggerFactory.getLogger(ReadUncommitted.class);
 
         private final KafkaConsumer<String, String> consumer;
         private final String topic;

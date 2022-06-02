@@ -12,7 +12,7 @@ import java.util.Properties;
 
 public class IdempotentKafkaProducer {
 
-    protected static Logger logger = LoggerFactory.getLogger(IdempotentKafkaProducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(IdempotentKafkaProducer.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;

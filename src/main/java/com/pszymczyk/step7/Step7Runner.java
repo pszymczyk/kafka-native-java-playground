@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Step7Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step7Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step7Runner.class);
 
     public static void main(String[] args) {
         String topic = "step7";

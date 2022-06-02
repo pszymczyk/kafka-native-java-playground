@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SimpleKafkaProducer {
 
-    protected static Logger logger = LoggerFactory.getLogger(SimpleKafkaProducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimpleKafkaProducer.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;

@@ -7,7 +7,7 @@ import java.util.concurrent.Executors;
 
 public class Step5Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step5Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step5Runner.class);
 
     public static void main(String[] args) {
         var topic = "step5";
