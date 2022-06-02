@@ -1,5 +1,6 @@
 package com.pszymczyk;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -35,6 +36,8 @@ public class ConsumerLoop implements AutoCloseable {
         props.put(GROUP_ID_CONFIG, groupId);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+//        props.put(SESSION_TIMEOUT_MS_CONFIG, 50);
+//        props.put(HEARTBEAT_INTERVAL_MS_CONFIG, 25);
         this.consumer = new KafkaConsumer<>(props);
     }
 
@@ -55,6 +58,12 @@ public class ConsumerLoop implements AutoCloseable {
 
     @Override
     public void close() {
+        logger.info("Closing Kafka consumer...");
         consumer.close();
+        logger.info("Kafka consumer closed.");
+    }
+
+    public void wakeup() {
+        consumer.wakeup();
     }
 }
