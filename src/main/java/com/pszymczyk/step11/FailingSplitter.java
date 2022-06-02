@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.*;
 
-
 public class FailingSplitter implements Runnable {
 
     protected static Logger logger = LoggerFactory.getLogger(FailingSplitter.class);
@@ -24,7 +23,6 @@ public class FailingSplitter implements Runnable {
     private final String loanApplicationRequestsTopic;
     private final String loanApplicationDecisionsTopic;
     private final String groupId;
-
 
     public FailingSplitter(String loanApplicationRequestsTopic, String loanApplicationDecisionsTopic, String groupId) {
         this.loanApplicationRequestsTopic = loanApplicationRequestsTopic;
@@ -55,20 +53,23 @@ public class FailingSplitter implements Runnable {
         consumer.subscribe(List.of(loanApplicationRequestsTopic));
         while (true) {
             var loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            producer.beginTransaction();
-            try {
-                List<ProducerRecord<String, String>> outputRecords = processApplications(loanApplicationRequests);
-                for (ProducerRecord<String, String> outputRecord : outputRecords) {
-                    producer.send(outputRecord);
+            for (ConsumerRecord<String, String> request : loanApplicationRequests) {
+                producer.beginTransaction();
+                try {
+                    for (var singleChar : request.value().split("\\.")) {
+                        ProducerRecord<String, String> producerRecord = new ProducerRecord<>(loanApplicationDecisionsTopic, singleChar);
+                        producer.send(producerRecord);
+                    }
+                    producer.sendOffsetsToTransaction(
+                        Map.of(new TopicPartition(request.topic(), request.partition()),
+                            new OffsetAndMetadata(request.offset())), new ConsumerGroupMetadata(groupId));
+                    failSometimes();
+                    producer.commitTransaction();
+                } catch (Exception e) {
+                    logger.error("Exception during transaction!", e);
+                    producer.abortTransaction();
+                    consumer.seek(new TopicPartition(request.topic(), request.partition()), request.offset());
                 }
-                producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), new ConsumerGroupMetadata(groupId));
-
-                failSometimes();
-
-                producer.commitTransaction();
-            } catch (Exception e) {
-                logger.error("Exception during transaction!", e);
-                producer.abortTransaction();
             }
         }
     }
@@ -90,18 +91,6 @@ public class FailingSplitter implements Runnable {
             offsetsToCommit.put(partition, new OffsetAndMetadata(offset + 1));
         }
         return offsetsToCommit;
-    }
-
-    private List<ProducerRecord<String, String>> processApplications(ConsumerRecords<String, String> loanApplicationRequests) {
-        var producerRecords = new ArrayList<ProducerRecord<String, String>>();
-        for (var record : loanApplicationRequests) {
-            for (var singleChar : record.value().split("\\.")) {
-                ProducerRecord<String, String> loanApplicationDecisionProducerRecord = new ProducerRecord<>(loanApplicationDecisionsTopic, singleChar);
-                producerRecords.add(loanApplicationDecisionProducerRecord);
-            }
-        }
-
-        return producerRecords;
     }
 
     public void shutdown() {
