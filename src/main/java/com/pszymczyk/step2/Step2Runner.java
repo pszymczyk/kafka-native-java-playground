@@ -45,8 +45,14 @@ public class Step2Runner {
             }
         }, "shutdown-hook-thread"));
 
+        logger.info("Starting consumer thread 0...");
         consumer0Thread.start();
+        logger.info("Consumer thread 0 started.");
+        logger.info("Starting consumer thread 1...");
         consumer1Thread.start();
+        logger.info("Consumer thread 1 started.");
+        logger.info("Starting consumer thread 2...");
         consumer2Thread.start();
+        logger.info("Consumer thread 2 started.");
     }
 }
