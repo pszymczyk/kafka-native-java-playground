@@ -3,19 +3,19 @@ package com.pszymczyk.step3;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
-public class ConsumerLoopManualCommit implements AutoCloseable {
+public class ConsumerLoopManualCommit {
 
     private static final Logger logger = LoggerFactory.getLogger(ConsumerLoopManualCommit.class);
 
@@ -38,34 +38,32 @@ public class ConsumerLoopManualCommit implements AutoCloseable {
     public void start() {
         consumer.subscribe(List.of(topic));
 
-        var lastConsumedOffsetsOnPartitions = new HashMap<Integer, Long>();
+        try {
+            while (true) {
+                var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                for (var record : records) {
+                    logger.info("Consumer id: {}, ConsumerRecord: {}",
+                            this.id,
+                            Map.of("partition", record.partition(),
+                                    "offset", record.offset(),
+                                    "value", record.value()));
 
-        while (true) {
-            var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            for (var record : records) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("partition", record.partition());
-                data.put("offset", record.offset());
-                data.put("value", record.value());
-                lastConsumedOffsetsOnPartitions.put(record.partition(), record.offset());
-                logger.info("Consumer id: {}, ConsumerRecord: {}", this.id, data);
-            }
-
-            for (var partitionAndOffset : lastConsumedOffsetsOnPartitions.entrySet()) {
-                if (partitionAndOffset.getValue() % 5 == 0) {
-                    Map<TopicPartition, OffsetAndMetadata> offsetToCommit = Map.of(
-                            new TopicPartition(topic, partitionAndOffset.getKey()),
-                            //The committed offset should always be the offset of the next message that your application will read
-                            new OffsetAndMetadata(partitionAndOffset.getValue() + 1));
-                    logger.info("Commit offset {} on partition {}", partitionAndOffset.getValue()+1, partitionAndOffset.getKey());
-                    consumer.commitSync(offsetToCommit);
+                    if (record.offset() % 5 == 0) {
+                        consumer.commitSync(Map.of(new TopicPartition(topic, record.partition()), new OffsetAndMetadata(record.offset())));
+                        logger.info("Commit offset {} on partition {}", record.offset() + 1, record.partition());
+                    }
                 }
             }
+        } catch (WakeupException wakeupException) {
+            logger.info("Handling WakeupException.");
+        } finally {
+            logger.info("Closing Kafka consumer...");
+            consumer.close();
+            logger.info("Kafka consumer closed.");
         }
     }
 
-    @Override
-    public void close() {
-        consumer.close();
+    public void wakeup() {
+        consumer.wakeup();
     }
 }

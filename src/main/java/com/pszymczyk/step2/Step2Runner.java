@@ -4,6 +4,8 @@ import com.pszymczyk.ConsumerLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.pszymczyk.Utils.wakeUpConsumer;
+
 @SuppressWarnings("Duplicates")
 public class Step2Runner {
 
@@ -22,27 +24,9 @@ public class Step2Runner {
         var consumer2Thread = new Thread(consumer2::start, "consumer-2-thread");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Hello consumer 0, wakeup!");
-            consumer0.wakeup();
-            try {
-                consumer0Thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            logger.info("Hello consumer 1, wakeup!");
-            consumer1.wakeup();
-            try {
-                consumer1Thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            logger.info("Hello consumer 2, wakeup!");
-            consumer2.wakeup();
-            try {
-                consumer2Thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            wakeUpConsumer("0", consumer0, consumer0Thread);
+            wakeUpConsumer("1", consumer1, consumer1Thread);
+            wakeUpConsumer("2", consumer2, consumer2Thread);
         }, "shutdown-hook-thread"));
 
         logger.info("Starting consumer thread 0...");
