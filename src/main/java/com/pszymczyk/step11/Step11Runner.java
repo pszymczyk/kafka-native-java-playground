@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("Duplicates")
 public class Step11Runner {
 
     private static final Logger logger = LoggerFactory.getLogger(Step11Runner.class);
@@ -16,19 +17,22 @@ public class Step11Runner {
         String outputTopic = "step11-output";
         String groupId = "step11";
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        FailingSplitter failingSplitter = new FailingSplitter(inputTopic, outputTopic, groupId);
-        executor.submit(failingSplitter);
+        var consumer = new FailingSplitter(inputTopic, outputTopic, groupId);
+        var kafkaConsumerThread = new Thread(consumer::start, "kafka-consumer-thread");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            failingSplitter.shutdown();
-            executor.shutdown();
+            logger.info("Hello Kafka consumer, wakeup!");
+            consumer.wakeup();
             try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                kafkaConsumerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }));
+        }, "shutdown-hook-thread"));
+
+        logger.info("Starting Kafka consumer thread.");
+        kafkaConsumerThread.start();
+        logger.info("Kafka consumer thread started.");
     }
 
 }

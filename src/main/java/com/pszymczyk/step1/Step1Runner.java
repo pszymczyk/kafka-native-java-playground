@@ -4,6 +4,7 @@ import com.pszymczyk.ConsumerLoop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("Duplicates")
 public class Step1Runner {
 
     private static final Logger logger = LoggerFactory.getLogger(Step1Runner.class);

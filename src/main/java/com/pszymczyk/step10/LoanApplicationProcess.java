@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.Properties;
 
 
-public class LoanApplicationProcess implements AutoCloseable {
+public class LoanApplicationProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(LoanApplicationProcess.class);
 
@@ -103,8 +103,7 @@ public class LoanApplicationProcess implements AutoCloseable {
         return loanApplicationDecision;
     }
 
-    @Override
-    public void close() {
-        consumer.close();
+    public void wakeup() {
+        consumer.wakeup();
     }
 }

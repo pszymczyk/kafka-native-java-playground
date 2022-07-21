@@ -2,11 +2,7 @@ package com.pszymczyk.step11;
 
 
 import com.pszymczyk.Utils;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -21,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class FailingSplitter implements Runnable {
+public class FailingSplitter {
 
     private static final Logger logger = LoggerFactory.getLogger(FailingSplitter.class);
 
@@ -54,8 +50,7 @@ public class FailingSplitter implements Runnable {
         this.producer = new KafkaProducer<>(producerProperties);
     }
 
-    @Override
-    public void run() {
+    public void start() {
         producer.initTransactions();
         consumer.subscribe(List.of(loanApplicationRequestsTopic));
         while (true) {
@@ -81,8 +76,7 @@ public class FailingSplitter implements Runnable {
         }
     }
 
-    public void shutdown() {
-        producer.close();
-        consumer.close();
+    public void wakeup() {
+        consumer.wakeup();
     }
 }
