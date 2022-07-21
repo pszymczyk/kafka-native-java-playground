@@ -46,7 +46,7 @@ public class FailingSplitter {
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProperties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
-        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "rental_car_process_1");
+        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "failing_splitter_0");
         this.producer = new KafkaProducer<>(producerProperties);
     }
 
