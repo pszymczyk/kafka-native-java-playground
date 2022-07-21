@@ -39,23 +39,5 @@ public class Step3Runner {
         logger.info("Starting consumer thread 2...");
         consumer2Thread.start();
         logger.info("Consumer thread 2 started.");
-
-
-        var executor = Executors.newFixedThreadPool(3);
-        executor.submit(() -> {
-            try (var consumerLoop = new ConsumerLoopManualCommit(0, groupId, topic)) {
-                consumerLoop.start();
-            }
-        });
-        executor.submit(() -> {
-            try (var consumerLoop = new ConsumerLoopManualCommit(1, groupId, topic)) {
-                consumerLoop.start();
-            }
-        });
-        executor.submit(() -> {
-            try (var consumerLoop = new ConsumerLoopManualCommit(2, groupId, topic)) {
-                consumerLoop.start();
-            }
-        });
     }
 }
