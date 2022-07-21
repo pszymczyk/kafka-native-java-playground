@@ -1,6 +1,7 @@
 package com.pszymczyk.step4;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.Properties;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
 @SuppressWarnings("Duplicates")
-public class ConsumerLoopWithCustomDeserializer implements AutoCloseable {
+public class ConsumerLoopWithCustomDeserializer {
 
     private static final Logger logger = LoggerFactory.getLogger(ConsumerLoopWithCustomDeserializer.class);
 
@@ -34,20 +35,27 @@ public class ConsumerLoopWithCustomDeserializer implements AutoCloseable {
     public void start() {
         consumer.subscribe(List.of(topic));
 
-        while (true) {
-            var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            for (var record : records) {
-                Map<String, Object> data = new HashMap<>();
-                data.put("partition", record.partition());
-                data.put("offset", record.offset());
-                data.put("value", record.value());
-                logger.info("ConsumerRecord: {}", data);
+        try {
+            while (true) {
+                var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                for (var record : records) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("partition", record.partition());
+                    data.put("offset", record.offset());
+                    data.put("value", record.value());
+                    logger.info("ConsumerRecord: {}", data);
+                }
             }
+        } catch (WakeupException wakeupException) {
+            logger.info("Handling WakeupException.");
+        } finally {
+            logger.info("Closing Kafka consumer...");
+            consumer.close();
+            logger.info("Kafka consumer closed.");
         }
     }
 
-    @Override
-    public void close() {
-        consumer.close();
+    public void wakeup() {
+        consumer.wakeup();
     }
 }
