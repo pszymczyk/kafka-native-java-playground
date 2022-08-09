@@ -35,6 +35,7 @@ public class ConsumerLoop {
         props.put(GROUP_ID_CONFIG, groupId);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(GROUP_INSTANCE_ID_CONFIG, "local-1");
         this.consumer = new KafkaConsumer<>(props);
     }
 
