@@ -1,26 +1,32 @@
 package com.pszymczyk.step4;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+@SuppressWarnings("Duplicates")
 public class Step4Runner {
+
+    private static final Logger logger = LoggerFactory.getLogger(Step4Runner.class);
 
     public static void main(String[] args) {
         String groupId = "step4";
         String topic = "step4";
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        ConsumerLoopWithCutomDeserializer consumer = new ConsumerLoopWithCutomDeserializer(0, groupId, topic);
-        executor.submit(consumer);
+
+        var consumer = new ConsumerLoopWithCustomDeserializer(groupId, topic);
+        var kafkaConsumerThread = new Thread(consumer::start, "kafka-consumer-thread");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            consumer.shutdown();
-            executor.shutdown();
+            logger.info("Hello Kafka consumer, wakeup!");
+            consumer.wakeup();
             try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                kafkaConsumerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }));
+        }, "shutdown-hook-thread"));
+
+        logger.info("Starting Kafka consumer thread.");
+        kafkaConsumerThread.start();
+        logger.info("Kafka consumer thread started.");
     }
 }

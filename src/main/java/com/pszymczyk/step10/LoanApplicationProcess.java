@@ -1,8 +1,8 @@
 package com.pszymczyk.step10;
 
+import com.pszymczyk.Utils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -12,19 +12,19 @@ import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 
 
-public class LoanApplicationProcess implements Runnable {
+public class LoanApplicationProcess {
+
+    private static final Logger logger = LoggerFactory.getLogger(LoanApplicationProcess.class);
 
     private final KafkaConsumer<String, LoanApplicationRequest> consumer;
     private final KafkaProducer<String, LoanApplicationDecision> producer;
@@ -34,110 +34,86 @@ public class LoanApplicationProcess implements Runnable {
     private final DebtorsRepository debtorsRepository;
 
 
-    public LoanApplicationProcess(String loanApplicationRequestsTopic, String loanApplicationDecisionsTopic, String groupId,
+    public LoanApplicationProcess(String loanApplicationRequestsTopic,
+                                  String loanApplicationDecisionsTopic,
+                                  String groupId,
                                   DebtorsRepository debtorsRepository) {
         this.loanApplicationRequestsTopic = loanApplicationRequestsTopic;
         this.loanApplicationDecisionsTopic = loanApplicationDecisionsTopic;
         this.groupId = groupId;
         this.debtorsRepository = debtorsRepository;
 
-        Properties consumerProperties = new Properties();
+        var consumerProperties = new Properties();
         consumerProperties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, LoanApplicationDeserializer.class.getName());
         consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        consumerProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerProperties.put(ConsumerConfig.GROUP_INSTANCE_ID_CONFIG, "local-1");
         this.consumer = new KafkaConsumer<>(consumerProperties);
 
-        Properties producerProperties = new Properties();
+        var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, LoanApplicationDecisionSerializer.class.getName());
-        producerProperties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true");
-        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "rental_car_process_1");
+        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "loan_application_requests_0");
         this.producer = new KafkaProducer<>(producerProperties);
 
     }
 
-    @Override
-    public void run() {
+    public void start() {
         producer.initTransactions();
-        try {
-            consumer.subscribe(Arrays.asList(loanApplicationRequestsTopic));
-            while (true) {
-                ConsumerRecords<String, LoanApplicationRequest> loanApplicationRequests = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                if (!loanApplicationRequests.isEmpty()) {
+        consumer.subscribe(List.of(loanApplicationRequestsTopic));
+        while (true) {
+            try {
+                var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                for (var record : records) {
                     producer.beginTransaction();
                     try {
-                        List<ProducerRecord<String, LoanApplicationDecision>> outputRecords = processApplications(loanApplicationRequests);
-                        for (ProducerRecord<String, LoanApplicationDecision> outputRecord : outputRecords) {
-                            producer.send(outputRecord);
-                        }
-                        producer.sendOffsetsToTransaction(getUncommittedOffsets(loanApplicationRequests), groupId);
-                        Random rand = new Random();
-                        int randomNum = rand.nextInt((4 - 1) + 1) + 1;
-                        System.err.println(randomNum);
-                        if (randomNum == 2) {
-                            throw new Exception();
-                        }
+                        LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
+                        producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
+                        producer.sendOffsetsToTransaction(
+                                Map.of(new TopicPartition(record.topic(), record.partition()),
+                                        new OffsetAndMetadata(record.offset() + 1)), new ConsumerGroupMetadata(groupId));
+                        Utils.failSometimes();
                         producer.commitTransaction();
                     } catch (Exception e) {
+                        logger.error("Something wrong happened!", e);
                         producer.abortTransaction();
-                        continue;
+                        consumer.seek(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()));
                     }
-
                 }
-
+            } catch (WakeupException wakeupException) {
+                logger.info("Handling WakeupException.");
+            } finally {
+                logger.info("Closing Kafka consumer...");
+                consumer.close();
+                logger.info("Kafka consumer closed.");
             }
-        } catch (WakeupException e) {
-            // ignore for shutdown
-        } finally {
-            consumer.close();
-            producer.close();
         }
     }
 
-    private Map<TopicPartition, OffsetAndMetadata> getUncommittedOffsets(ConsumerRecords<String, LoanApplicationRequest> records) {
-        Map<TopicPartition, OffsetAndMetadata> offsetsToCommit = new HashMap<>();
-        for (TopicPartition partition : records.partitions()) {
-            List<ConsumerRecord<String, LoanApplicationRequest>> partitionedRecords = records.records(partition);
-            long offset = partitionedRecords.get(partitionedRecords.size() - 1).offset();
-            offsetsToCommit.put(partition, new OffsetAndMetadata(offset + 1));
-        }
-        return offsetsToCommit;
-    }
-
-    private List<ProducerRecord<String, LoanApplicationDecision>> processApplications(ConsumerRecords<String, LoanApplicationRequest> loanApplicationRequests) {
-        List<ProducerRecord<String, LoanApplicationDecision>> loanApplicationDecisions = new ArrayList<>();
-        for (ConsumerRecord<String, LoanApplicationRequest> loanApplicationRequestConsumerRecord : loanApplicationRequests) {
-            LoanApplicationRequest loanApplicationRequest = loanApplicationRequestConsumerRecord.value();
-            if (debtorsRepository.getDebtors().contains(loanApplicationRequest.getRequester())) {
-                submitDecision(loanApplicationDecisions, loanApplicationRequest.getAmount().multiply(new BigDecimal("0.5")),
+    private LoanApplicationDecision processApplication(LoanApplicationRequest loanApplicationRequest) {
+        LoanApplicationDecision loanApplicationDecision;
+        if (debtorsRepository.getDebtors().contains(loanApplicationRequest.getRequester())) {
+            loanApplicationDecision = submitDecision(loanApplicationRequest.getAmount().multiply(new BigDecimal("0.5")),
                     loanApplicationRequest.getRequester());
-            } else if (debtorsRepository.getBlackList().contains(loanApplicationRequest.getRequester())) {
-                submitDecision(loanApplicationDecisions, BigDecimal.ZERO, loanApplicationRequest.getRequester());
-            } else {
-                submitDecision(loanApplicationDecisions, loanApplicationRequest.getAmount(), loanApplicationRequest.getRequester());
-            }
+        } else if (debtorsRepository.getBlackList().contains(loanApplicationRequest.getRequester())) {
+            loanApplicationDecision = submitDecision(BigDecimal.ZERO, loanApplicationRequest.getRequester());
+        } else {
+            loanApplicationDecision = submitDecision(loanApplicationRequest.getAmount(), loanApplicationRequest.getRequester());
         }
-
-        return loanApplicationDecisions;
+        return loanApplicationDecision;
     }
 
-    void submitDecision(List<ProducerRecord<String, LoanApplicationDecision>> loanApplicationDecisions,
-                        BigDecimal amount,
-                        String requester) {
+    LoanApplicationDecision submitDecision(BigDecimal amount, String requester) {
         LoanApplicationDecision loanApplicationDecision = new LoanApplicationDecision();
         loanApplicationDecision.setAmount(amount);
         loanApplicationDecision.setRequester(requester);
-        ProducerRecord<String, LoanApplicationDecision> loanApplicationDecisionProducerRecord = new ProducerRecord<>(loanApplicationDecisionsTopic,
-            loanApplicationDecision);
-        loanApplicationDecisions.add(loanApplicationDecisionProducerRecord);
+        return loanApplicationDecision;
     }
 
-
-    public void shutdown() {
+    public void wakeup() {
         consumer.wakeup();
     }
 }

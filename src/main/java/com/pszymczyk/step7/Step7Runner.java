@@ -8,11 +8,11 @@ import java.util.concurrent.TimeUnit;
 
 public class Step7Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step7Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step7Runner.class);
 
     public static void main(String[] args) {
         String topic = "step7";
-        SimpleKafkaProducerWithCustomPartioner simpleKafkaProducer = new SimpleKafkaProducerWithCustomPartioner(topic);
+        SimpleKafkaProducerWithCustomPartitioner simpleKafkaProducer = new SimpleKafkaProducerWithCustomPartitioner(topic);
 
         simpleKafkaProducer.syncSend("vip", "Vip message " + UUID.randomUUID(), 5, TimeUnit.SECONDS);
         simpleKafkaProducer.syncSend("VIP", "Vip message " + UUID.randomUUID(), 5, TimeUnit.SECONDS);

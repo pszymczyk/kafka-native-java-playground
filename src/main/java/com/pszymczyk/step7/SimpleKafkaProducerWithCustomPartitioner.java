@@ -1,6 +1,5 @@
 package com.pszymczyk.step7;
 
-import com.pszymczyk.ConsumerLoop;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -12,15 +11,15 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class SimpleKafkaProducerWithCustomPartioner {
+public class SimpleKafkaProducerWithCustomPartitioner {
 
-    protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimpleKafkaProducerWithCustomPartitioner.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;
 
-    public SimpleKafkaProducerWithCustomPartioner(String topic) {
-        Properties producerProperties = new Properties();
+    public SimpleKafkaProducerWithCustomPartitioner(String topic) {
+        var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -30,7 +29,7 @@ public class SimpleKafkaProducerWithCustomPartioner {
     }
 
     public RecordMetadata syncSend(String key, String messageValue, long timeout, TimeUnit timeUnit) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, messageValue);
+        var record = new ProducerRecord<>(topic, key, messageValue);
         try {
             return kafkaProducer.send(record).get(timeout, timeUnit);
         } catch (Exception e) {
