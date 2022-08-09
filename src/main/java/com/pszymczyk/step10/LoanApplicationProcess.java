@@ -9,6 +9,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -63,22 +64,30 @@ public class LoanApplicationProcess {
         producer.initTransactions();
         consumer.subscribe(List.of(loanApplicationRequestsTopic));
         while (true) {
-            var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            for (var record : records) {
-                producer.beginTransaction();
-                try {
-                    LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
-                    producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
-                    producer.sendOffsetsToTransaction(
-                        Map.of(new TopicPartition(record.topic(), record.partition()),
-                            new OffsetAndMetadata(record.offset() + 1)), new ConsumerGroupMetadata(groupId));
-                    Utils.failSometimes();
-                    producer.commitTransaction();
-                } catch (Exception e) {
-                    logger.error("Something wrong happened!", e);
-                    producer.abortTransaction();
-                    consumer.seek(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()));
+            try {
+                var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                for (var record : records) {
+                    producer.beginTransaction();
+                    try {
+                        LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
+                        producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
+                        producer.sendOffsetsToTransaction(
+                                Map.of(new TopicPartition(record.topic(), record.partition()),
+                                        new OffsetAndMetadata(record.offset() + 1)), new ConsumerGroupMetadata(groupId));
+                        Utils.failSometimes();
+                        producer.commitTransaction();
+                    } catch (Exception e) {
+                        logger.error("Something wrong happened!", e);
+                        producer.abortTransaction();
+                        consumer.seek(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()));
+                    }
                 }
+            } catch (WakeupException wakeupException) {
+                logger.info("Handling WakeupException.");
+            } finally {
+                logger.info("Closing Kafka consumer...");
+                consumer.close();
+                logger.info("Kafka consumer closed.");
             }
         }
     }
@@ -87,7 +96,7 @@ public class LoanApplicationProcess {
         LoanApplicationDecision loanApplicationDecision;
         if (debtorsRepository.getDebtors().contains(loanApplicationRequest.getRequester())) {
             loanApplicationDecision = submitDecision(loanApplicationRequest.getAmount().multiply(new BigDecimal("0.5")),
-                loanApplicationRequest.getRequester());
+                    loanApplicationRequest.getRequester());
         } else if (debtorsRepository.getBlackList().contains(loanApplicationRequest.getRequester())) {
             loanApplicationDecision = submitDecision(BigDecimal.ZERO, loanApplicationRequest.getRequester());
         } else {
