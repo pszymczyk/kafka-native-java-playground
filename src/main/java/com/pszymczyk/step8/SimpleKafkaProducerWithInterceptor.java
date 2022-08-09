@@ -1,4 +1,4 @@
-package com.pszymczyk.step7;
+package com.pszymczyk.step8;
 
 import com.pszymczyk.ConsumerLoop;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -12,25 +12,25 @@ import org.slf4j.LoggerFactory;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class SimpleKafkaProducerWithCustomPartioner {
+public class SimpleKafkaProducerWithInterceptor {
 
     protected static Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
 
     private final KafkaProducer<String, String> kafkaProducer;
     private final String topic;
 
-    public SimpleKafkaProducerWithCustomPartioner(String topic) {
+    public SimpleKafkaProducerWithInterceptor(String topic) {
         Properties producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, VipClientsPartitioner.class);
         this.kafkaProducer = new KafkaProducer<>(producerProperties);
         this.topic = topic;
+        throw new RuntimeException("not implemented ,register Interceptor");
     }
 
-    public RecordMetadata syncSend(String key, String messageValue, long timeout, TimeUnit timeUnit) {
-        ProducerRecord<String, String> record = new ProducerRecord<>(topic, key, messageValue);
+    public RecordMetadata syncSend(String messageValue, long timeout, TimeUnit timeUnit) {
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, messageValue);
         try {
             return kafkaProducer.send(record).get(timeout, timeUnit);
         } catch (Exception e) {

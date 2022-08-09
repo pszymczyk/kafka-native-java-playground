@@ -1,28 +1,38 @@
 package com.pszymczyk.step1;
 
 import com.pszymczyk.ConsumerLoop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+@SuppressWarnings("Duplicates")
 public class Step1Runner {
 
+    private static final Logger logger = LoggerFactory.getLogger(Step1Runner.class);
+
     public static void main(String[] args) {
-        String groupId = "step1_1";
-        String topic = "step1";
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        ConsumerLoop consumer = new ConsumerLoop(0, groupId, topic);
-        executor.submit(consumer);
+        var groupId = "step1";
+        var topic = "step1";
+
+        final ConsumerLoop consumer = new ConsumerLoop(groupId, topic);
+        var kafkaConsumerThread = new Thread(consumer::start, "kafka-consumer-thread");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            consumer.shutdown();
-            executor.shutdown();
+            logger.info("Hello Kafka consumer, wakeup!");
+            consumer.wakeup();
             try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                kafkaConsumerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }));
+        }, "shutdown-hook-thread"));
+
+        logger.info("Starting Kafka consumer thread.");
+        kafkaConsumerThread.start();
+        logger.info("Kafka consumer thread started.");
+
+
+
+
+
     }
 }
