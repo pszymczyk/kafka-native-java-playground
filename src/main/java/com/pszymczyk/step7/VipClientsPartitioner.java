@@ -2,10 +2,8 @@ package com.pszymczyk.step7;
 
 import org.apache.kafka.clients.producer.Partitioner;
 import org.apache.kafka.common.Cluster;
-import org.apache.kafka.common.PartitionInfo;
 
 import java.util.Map;
-import java.util.Objects;
 
 public class VipClientsPartitioner implements Partitioner {
     @Override

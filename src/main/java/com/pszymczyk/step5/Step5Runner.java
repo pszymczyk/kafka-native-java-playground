@@ -3,35 +3,34 @@ package com.pszymczyk.step5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+@SuppressWarnings("Duplicates")
 public class Step5Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step5Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step5Runner.class);
 
     public static void main(String[] args) {
-        String topic = "step5";
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        FirstLevelCacheBackedByKafka firstLevelCacheBackedByKafka = new FirstLevelCacheBackedByKafka(topic);
-        executor.submit(firstLevelCacheBackedByKafka);
+        var topic = "step5";
+        var kafkaConsumer = new FirstLevelCacheBackedByKafka(topic);
+        var kafkaConsumerThread = new Thread(kafkaConsumer::start, "kafka-consumer-thread");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            firstLevelCacheBackedByKafka.shutdown();
-            executor.shutdown();
+            logger.info("Hello Kafka consumer, wakeup!");
+            kafkaConsumer.wakeup();
             try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                kafkaConsumerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }));
+        }, "shutdown-hook-thread"));
+
+        logger.info("Starting Kafka consumer thread.");
+        kafkaConsumerThread.start();
+        logger.info("Kafka consumer thread started.");
 
         while (true) {
-            logger.info("Cached items:");
-            logger.info(""+firstLevelCacheBackedByKafka.getCachedItems());
+            logger.info("Cache: {}",FirstLevelCacheBackedByKafka.getCachedItems());
             try {
-                Thread.sleep(5000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

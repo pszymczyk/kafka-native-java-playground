@@ -3,32 +3,31 @@ package com.pszymczyk.step10;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
+@SuppressWarnings("Duplicates")
 public class Step10Runner {
 
-    protected static Logger logger = LoggerFactory.getLogger(Step10Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step10Runner.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         String inputTopic = "loan-application-requests";
         String outputTopic = "loan-application-decisions";
         String groupId = "step10";
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        LoanApplicationProcess loanApplicationProcess = new LoanApplicationProcess(inputTopic, outputTopic, groupId, new DebtorsRepository() { });
-        executor.submit(loanApplicationProcess);
+        var consumer = new LoanApplicationProcess(inputTopic, outputTopic, groupId, new DebtorsRepository() {});
+        var kafkaConsumerThread = new Thread(consumer::start, "kafka-consumer-thread");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            loanApplicationProcess.shutdown();
-            executor.shutdown();
+            logger.info("Hello Kafka consumer, wakeup!");
+            consumer.wakeup();
             try {
-                executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+                kafkaConsumerThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        }));
-    }
+        }, "shutdown-hook-thread"));
 
+        logger.info("Starting Kafka consumer thread.");
+        kafkaConsumerThread.start();
+        logger.info("Kafka consumer thread started.");
+    }
 }
