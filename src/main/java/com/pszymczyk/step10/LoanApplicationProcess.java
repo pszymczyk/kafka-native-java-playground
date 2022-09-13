@@ -64,8 +64,8 @@ public class LoanApplicationProcess {
     public void start() {
         producer.initTransactions();
         consumer.subscribe(List.of(loanApplicationRequestsTopic));
-        while (true) {
-            try {
+        try {
+            while (true) {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (var record : records) {
                     producer.beginTransaction();
@@ -83,13 +83,13 @@ public class LoanApplicationProcess {
                         consumer.seek(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()));
                     }
                 }
-            } catch (WakeupException wakeupException) {
-                logger.info("Handling WakeupException.");
-            } finally {
-                logger.info("Closing Kafka consumer...");
-                consumer.close();
-                logger.info("Kafka consumer closed.");
             }
+        } catch (WakeupException wakeupException) {
+            logger.info("Handling WakeupException.");
+        } finally {
+            logger.info("Closing Kafka consumer...");
+            consumer.close();
+            logger.info("Kafka consumer closed.");
         }
     }
 
