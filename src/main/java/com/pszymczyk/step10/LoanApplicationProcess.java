@@ -81,6 +81,7 @@ public class LoanApplicationProcess {
                         logger.error("Something wrong happened!", e);
                         producer.abortTransaction();
                         consumer.seek(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()));
+                        break;
                     }
                 }
             }
@@ -90,6 +91,7 @@ public class LoanApplicationProcess {
             logger.info("Closing Kafka consumer...");
             consumer.close();
             logger.info("Kafka consumer closed.");
+
         }
     }
 
