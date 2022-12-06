@@ -49,7 +49,6 @@ public class LoanApplicationProcess {
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, LoanApplicationDeserializer.class.getName());
         consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
-        consumerProperties.put(ConsumerConfig.GROUP_INSTANCE_ID_CONFIG, "local-1");
         this.consumer = new KafkaConsumer<>(consumerProperties);
 
         var producerProperties = new Properties();
@@ -64,8 +63,8 @@ public class LoanApplicationProcess {
     public void start() {
         producer.initTransactions();
         consumer.subscribe(List.of(loanApplicationRequestsTopic));
-        while (true) {
-            try {
+        try {
+            while (true) {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (var record : records) {
                     producer.beginTransaction();
@@ -81,15 +80,17 @@ public class LoanApplicationProcess {
                         logger.error("Something wrong happened!", e);
                         producer.abortTransaction();
                         consumer.seek(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()));
+                        break;
                     }
                 }
-            } catch (WakeupException wakeupException) {
-                logger.info("Handling WakeupException.");
-            } finally {
-                logger.info("Closing Kafka consumer...");
-                consumer.close();
-                logger.info("Kafka consumer closed.");
             }
+        } catch (WakeupException wakeupException) {
+            logger.info("Handling WakeupException.");
+        } finally {
+            logger.info("Closing Kafka consumer...");
+            consumer.close();
+            logger.info("Kafka consumer closed.");
+
         }
     }
 
