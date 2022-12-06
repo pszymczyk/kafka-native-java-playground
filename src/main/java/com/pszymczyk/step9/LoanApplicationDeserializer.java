@@ -1,4 +1,4 @@
-package com.pszymczyk.step10;
+package com.pszymczyk.step9;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.errors.SerializationException;
