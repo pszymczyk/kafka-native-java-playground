@@ -70,7 +70,7 @@ public class LoanApplicationProcess {
         LoanApplicationDecision loanApplicationDecision;
         if (debtorsRepository.getDebtors().contains(loanApplicationRequest.getRequester())) {
             loanApplicationDecision = submitDecision(loanApplicationRequest.getAmount().multiply(new BigDecimal("0.5")),
-                loanApplicationRequest.getRequester());
+                    loanApplicationRequest.getRequester());
         } else if (debtorsRepository.getBlackList().contains(loanApplicationRequest.getRequester())) {
             loanApplicationDecision = submitDecision(BigDecimal.ZERO, loanApplicationRequest.getRequester());
         } else {
