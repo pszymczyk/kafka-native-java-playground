@@ -1,14 +1,9 @@
 package com.pszymczyk.step9;
 
-import com.pszymczyk.Utils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -16,9 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 
@@ -61,28 +53,9 @@ public class LoanApplicationProcess {
     }
 
     public void start() {
-        producer.initTransactions();
-        consumer.subscribe(List.of(loanApplicationRequestsTopic));
         try {
             while (true) {
-                var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                for (var record : records) {
-                    producer.beginTransaction();
-                    try {
-                        LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
-                        producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
-                        producer.sendOffsetsToTransaction(
-                                Map.of(new TopicPartition(record.topic(), record.partition()),
-                                        new OffsetAndMetadata(record.offset() + 1)), new ConsumerGroupMetadata(groupId));
-                        Utils.failSometimes();
-                        producer.commitTransaction();
-                    } catch (Exception e) {
-                        logger.error("Something wrong happened!", e);
-                        producer.abortTransaction();
-                        consumer.seek(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset()));
-                        break;
-                    }
-                }
+                throw new RuntimeException("TODO");
             }
         } catch (WakeupException wakeupException) {
             logger.info("Handling WakeupException.");
