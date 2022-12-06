@@ -1,14 +1,21 @@
 package com.pszymczyk.step7;
 
 import org.apache.kafka.clients.producer.Partitioner;
+import org.apache.kafka.clients.producer.internals.DefaultPartitioner;
 import org.apache.kafka.common.Cluster;
-import org.apache.kafka.common.PartitionInfo;
 
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
 public class VipClientsPartitioner implements Partitioner {
+
+    private final Partitioner defaultPartitioner;
+
+    VipClientsPartitioner() {
+        this.defaultPartitioner = new DefaultPartitioner();
+    }
+
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {
         requireNonNull(key);
@@ -16,12 +23,8 @@ public class VipClientsPartitioner implements Partitioner {
         if (((String) key).toLowerCase().contains("vip")) {
             return 0;
         } else {
-            return cluster.availablePartitionsForTopic(topic)
-                .stream()
-                .filter(partitionInfo -> partitionInfo.partition() > 0)
-                .findAny()
-                .map(PartitionInfo::partition)
-                .orElseThrow(() -> new RuntimeException("No partition available for non vip clients!"));
+            int partition = defaultPartitioner.partition(topic, key, keyBytes, value, valueBytes, cluster);
+            return partition == 0 ? 1 : partition;
         }
     }
 
@@ -33,5 +36,10 @@ public class VipClientsPartitioner implements Partitioner {
     @Override
     public void configure(Map<String, ?> configs) {
 
+    }
+
+    @Override
+    public void onNewBatch(String topic, Cluster cluster, int prevPartition) {
+        this.defaultPartitioner.onNewBatch(topic, cluster, prevPartition);
     }
 }
