@@ -28,6 +28,7 @@ public class FirstLevelCacheBackedByKafka {
         props.put(GROUP_ID_CONFIG, "step5_" + Optional.ofNullable(System.getProperty("INSTANCE_ID")).orElse("0"));
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(SESSION_TIMEOUT_MS_CONFIG, 5000);
         this.consumer = new KafkaConsumer<>(props);
     }
 
