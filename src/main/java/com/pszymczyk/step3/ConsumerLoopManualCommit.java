@@ -32,7 +32,6 @@ public class ConsumerLoopManualCommit {
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(ENABLE_AUTO_COMMIT_CONFIG, false);
-        props.put(SESSION_TIMEOUT_MS_CONFIG, 5000);
         this.consumer = new KafkaConsumer<>(props);
     }
 
