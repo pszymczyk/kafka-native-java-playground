@@ -1,17 +1,17 @@
-package com.pszymczyk.step10;
+package com.pszymczyk.step9;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("Duplicates")
-public class Step10Runner {
+public class Step9Runner {
 
-    private static final Logger logger = LoggerFactory.getLogger(Step10Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(Step9Runner.class);
 
     public static void main(String[] args) {
         String inputTopic = "loan-application-requests";
         String outputTopic = "loan-application-decisions";
-        String groupId = "step10";
+        String groupId = "step9";
 
         var consumer = new LoanApplicationProcess(inputTopic, outputTopic, groupId, new DebtorsRepository() {});
         var kafkaConsumerThread = new Thread(consumer::start, "kafka-consumer-thread");

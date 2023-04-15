@@ -1,4 +1,4 @@
-package com.pszymczyk.step10;
+package com.pszymczyk.step9;
 
 import com.pszymczyk.Utils;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
