@@ -1,8 +1,8 @@
-package com.pszymczyk.step10;
+package com.pszymczyk.step9;
 
 import java.math.BigDecimal;
 
-public class LoanApplicationDecision {
+public class LoanApplicationRequest {
     private BigDecimal amount;
     private String requester;
 
