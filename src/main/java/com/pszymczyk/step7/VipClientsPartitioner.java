@@ -37,9 +37,4 @@ public class VipClientsPartitioner implements Partitioner {
     public void configure(Map<String, ?> configs) {
 
     }
-
-    @Override
-    public void onNewBatch(String topic, Cluster cluster, int prevPartition) {
-        this.defaultPartitioner.onNewBatch(topic, cluster, prevPartition);
-    }
 }
