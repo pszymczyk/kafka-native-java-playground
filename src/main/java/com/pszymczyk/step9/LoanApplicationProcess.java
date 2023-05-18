@@ -1,10 +1,7 @@
 package com.pszymczyk.step9;
 
 import com.pszymczyk.Utils;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -68,12 +65,12 @@ public class LoanApplicationProcess {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (var record : records) {
                     producer.beginTransaction();
+                    //executing sendOffsetsToTransaction(...) blocks polling message with given offset for other members within group
+                    producer.sendOffsetsToTransaction(getOffsets(record), new ConsumerGroupMetadata(groupId));
                     try {
                         LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
                         producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
-                        producer.sendOffsetsToTransaction(
-                                Map.of(new TopicPartition(record.topic(), record.partition()),
-                                        new OffsetAndMetadata(record.offset() + 1)), new ConsumerGroupMetadata(groupId));
+
                         Utils.failSometimes();
                         producer.commitTransaction();
                     } catch (Exception e) {
@@ -92,6 +89,11 @@ public class LoanApplicationProcess {
             logger.info("Kafka consumer closed.");
 
         }
+    }
+
+    private static Map<TopicPartition, OffsetAndMetadata> getOffsets(ConsumerRecord<String, LoanApplicationRequest> record) {
+        return Map.of(new TopicPartition(record.topic(), record.partition()),
+                new OffsetAndMetadata(record.offset() + 1));
     }
 
     private LoanApplicationDecision processApplication(LoanApplicationRequest loanApplicationRequest) {
