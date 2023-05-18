@@ -1,6 +1,5 @@
 package com.pszymczyk.step9;
 
-import com.pszymczyk.Utils;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -19,9 +18,9 @@ import java.util.Map;
 import java.util.Properties;
 
 
-public class LoanApplicationProcess {
+public class LoanApplicationProcess2 {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoanApplicationProcess.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoanApplicationProcess2.class);
 
     private final KafkaConsumer<String, LoanApplicationRequest> consumer;
     private final KafkaProducer<String, LoanApplicationDecision> producer;
@@ -31,10 +30,10 @@ public class LoanApplicationProcess {
     private final DebtorsRepository debtorsRepository;
 
 
-    public LoanApplicationProcess(String loanApplicationRequestsTopic,
-                                  String loanApplicationDecisionsTopic,
-                                  String groupId,
-                                  DebtorsRepository debtorsRepository) {
+    public LoanApplicationProcess2(String loanApplicationRequestsTopic,
+                                   String loanApplicationDecisionsTopic,
+                                   String groupId,
+                                   DebtorsRepository debtorsRepository) {
         this.loanApplicationRequestsTopic = loanApplicationRequestsTopic;
         this.loanApplicationDecisionsTopic = loanApplicationDecisionsTopic;
         this.groupId = groupId;
@@ -45,9 +44,9 @@ public class LoanApplicationProcess {
         consumerProperties.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         consumerProperties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProperties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, LoanApplicationDeserializer.class.getName());
+        consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         consumerProperties.put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, (int) Duration.ofSeconds(30).toMillis());
         consumerProperties.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
-        consumerProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
         this.consumer = new KafkaConsumer<>(consumerProperties);
 
         var producerProperties = new Properties();
@@ -70,18 +69,13 @@ public class LoanApplicationProcess {
                 for (var record : records) {
                     try {
                         LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
-                        Thread.sleep(Duration.ofMinutes(1).toMillis());
-                        logger.info("end of sleep");
-
 
                         producer.beginTransaction();
                         producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
                         producer.sendOffsetsToTransaction(
                                 Map.of(new TopicPartition(record.topic(), record.partition()),
                                         new OffsetAndMetadata(record.offset() + 1)), new ConsumerGroupMetadata(groupId));
-                        logger.info("end of send and send offsets");
                         producer.commitTransaction();
-                        logger.info("end of commit");
                     } catch (Exception e) {
                         logger.error("Something wrong happened!", e);
                         producer.abortTransaction();
