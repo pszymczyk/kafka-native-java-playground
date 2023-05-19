@@ -65,12 +65,10 @@ public class LoanApplicationProcess {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (var record : records) {
                     producer.beginTransaction();
-                    //executing sendOffsetsToTransaction(...) blocks polling message with given offset for other members within group
-                    producer.sendOffsetsToTransaction(getOffsets(record), new ConsumerGroupMetadata(groupId));
                     try {
                         LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
                         producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
-
+                        producer.sendOffsetsToTransaction(getOffsets(record), consumer.groupMetadata());
                         Utils.failSometimes();
                         producer.commitTransaction();
                     } catch (Exception e) {
