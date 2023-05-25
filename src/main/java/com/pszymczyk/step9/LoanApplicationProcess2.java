@@ -53,7 +53,7 @@ public class LoanApplicationProcess2 {
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, LoanApplicationDecisionSerializer.class.getName());
-        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "loan_application_requests_0");
+        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "loan_application_requests_1");
         producerProperties.put(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, (int) Duration.ofMinutes(5).toMillis());
         this.producer = new KafkaProducer<>(producerProperties);
 
