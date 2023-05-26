@@ -65,7 +65,7 @@ public class LoanApplicationProcess2 {
         try {
             while (true) {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                logger.info("{} ", records.iterator().next());
+                logger.info("Read record - {} ", records.iterator().next());
                 for (var record : records) {
                     try {
                         LoanApplicationDecision loanApplicationDecision = processApplication(record.value());
@@ -74,7 +74,7 @@ public class LoanApplicationProcess2 {
                         producer.send(new ProducerRecord<>(loanApplicationDecisionsTopic, loanApplicationDecision));
                         producer.sendOffsetsToTransaction(
                                 Map.of(new TopicPartition(record.topic(), record.partition()),
-                                        new OffsetAndMetadata(record.offset() + 1)), new ConsumerGroupMetadata(groupId));
+                                        new OffsetAndMetadata(record.offset() + 1)), consumer.groupMetadata());
                         producer.commitTransaction();
                     } catch (Exception e) {
                         logger.error("Something wrong happened!", e);
