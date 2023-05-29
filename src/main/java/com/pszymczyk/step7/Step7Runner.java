@@ -1,14 +1,9 @@
 package com.pszymczyk.step7;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class Step7Runner {
-
-    private static final Logger logger = LoggerFactory.getLogger(Step7Runner.class);
 
     public static void main(String[] args) {
         String topic = "step7";

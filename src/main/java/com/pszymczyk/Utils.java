@@ -1,6 +1,5 @@
 package com.pszymczyk;
 
-import com.pszymczyk.step2.Step2Runner;
 import com.pszymczyk.step3.ConsumerLoopManualCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

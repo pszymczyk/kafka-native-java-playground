@@ -27,7 +27,6 @@ public class LoanApplicationProcess {
     private final KafkaProducer<String, LoanApplicationDecision> producer;
     private final String loanApplicationRequestsTopic;
     private final String loanApplicationDecisionsTopic;
-    private final String groupId;
     private final DebtorsRepository debtorsRepository;
 
 
@@ -37,7 +36,6 @@ public class LoanApplicationProcess {
                                   DebtorsRepository debtorsRepository) {
         this.loanApplicationRequestsTopic = loanApplicationRequestsTopic;
         this.loanApplicationDecisionsTopic = loanApplicationDecisionsTopic;
-        this.groupId = groupId;
         this.debtorsRepository = debtorsRepository;
 
         var consumerProperties = new Properties();

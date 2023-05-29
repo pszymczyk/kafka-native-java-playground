@@ -1,5 +1,5 @@
-package com.pszymczyk.step3;
 
+package com.pszymczyk.step3;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
