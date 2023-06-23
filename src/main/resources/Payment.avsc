@@ -1,0 +1,20 @@
+{
+  "namespace": "com.displate.${domain}.${context}",
+  "type": "record",
+  "name": "${aggregateName}",
+  "fields": [
+    {
+      "name": "metadata",
+      "type": "record",
+      "fields": [
+        { "name": "utcTimestamp", "type": "Long"},
+        { "name": "timeZone", type:  "String" },
+        { "name": "eventType", type: "String" },
+        { "name": "eventId", type:  "String", logicalType:  "uuid" },
+        { "name": "causationId", type:  "String", logicalType:  "uuid" },
+        { "name": "correlationId", type:  "String", logicalType:  "uuid" },
+        { "name": "source", type:  "String", logicalType:  "uuid" }
+      ]
+    }
+  ]
+}
