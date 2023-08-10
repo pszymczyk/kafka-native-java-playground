@@ -2,6 +2,7 @@ package com.pszymczyk;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -20,15 +21,9 @@ public class ConsumerLoop {
     private static final Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
 
     private final KafkaConsumer<String, String> consumer;
-    private final int id;
     private final String topic;
 
     public ConsumerLoop(String groupId, String topic) {
-        this(0, groupId, topic);
-    }
-
-    public ConsumerLoop(int id, String groupId, String topic) {
-        this.id = id;
         this.topic = topic;
         var props = new Properties();
         props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -45,8 +40,8 @@ public class ConsumerLoop {
             while (true) {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (ConsumerRecord<String, String> record : records) {
-                    logger.info("Consumer id: {}, ConsumerRecord: {}",
-                            this.id,
+                    logger.info("Consumer thread: {}, ConsumerRecord: {}",
+                            Thread.currentThread().getName(),
                             Map.of(
                                     "partition", record.partition(),
                                     "offset", record.offset(),
