@@ -37,4 +37,12 @@ public class Utils {
             e.printStackTrace();
         }
     }
+
+    public static void sleeep(int ms) {
+        try {
+            Thread.sleep(ms);
+        } catch (InterruptedException e) {
+            logger.error("Sleep exception...", e);
+        }
+    }
 }
