@@ -15,21 +15,23 @@ import java.util.stream.IntStream;
 
 public class PublishRunner {
 
+    public static final String TOPIC = "step1";
     private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         final var random = new Random();
-        final var topic = "step1";
         final var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         final var kafkaProducer = new KafkaProducer<String, String>(producerProperties);
 
+        Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
+
         IntStream.generate(() -> random.nextInt(100_000)).mapToObj(Objects::toString).forEach(i -> {
             Utils.sleeep(100);
-            final var record = new ProducerRecord<>(topic, i, "My favourite number is " + i);
+            final var record = new ProducerRecord<>(TOPIC, i, "My favourite number is " + i);
                 kafkaProducer.send(record, (metadata, exception) -> {
                     if (metadata != null) {
                         logger.info("Message sent metadata: {}", metadata);
@@ -40,7 +42,6 @@ public class PublishRunner {
             }
         );
 
-        Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
     }
 }
