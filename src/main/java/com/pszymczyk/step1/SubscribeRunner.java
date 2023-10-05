@@ -25,13 +25,8 @@ public class SubscribeRunner {
 
     public static void main(String[] args) {
 
-        //Create KafkaConsumer
-        final var props = new Properties();
-        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(GROUP_ID_CONFIG, GROUP_ID);
-        props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        final var kafkaConsumer = new KafkaConsumer<String, String>(props);;
+        //Todo 1/3 - create Kafka Consumer
+        final KafkaConsumer<String, String> kafkaConsumer = null;
 
         //Register shutdown hook
         final var mainThread = Thread.currentThread();
@@ -46,22 +41,11 @@ public class SubscribeRunner {
         }, "shutdown-hook-thread"));
 
 
-        //subscribe
-        kafkaConsumer.subscribe(List.of(TOPIC));
+        //Todo 2/3 - subscribe
 
-        //poll records
+        //Todo 3/3 - poll records
         try {
-            while (true) {
-                var records = kafkaConsumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                for (ConsumerRecord<String, String> record : records) {
-                    logger.info("ConsumerRecord: {}",
-                        Map.of(
-                            "partition", record.partition(),
-                            "offset", record.offset(),
-                            "key", record.key(),
-                            "value", record.value()));
-                }
-            }
+
         } catch (WakeupException wakeupException) {
             logger.info("Handling WakeupException.");
         } finally {

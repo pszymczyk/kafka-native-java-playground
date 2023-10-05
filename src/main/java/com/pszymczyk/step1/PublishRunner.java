@@ -21,27 +21,16 @@ public class PublishRunner {
     public static void main(String[] args) {
 
         final var random = new Random();
-        final var producerProperties = new Properties();
-        producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        final var kafkaProducer = new KafkaProducer<String, String>(producerProperties);
+
+        //Todo 1/2 - create Kafka Producer
+        final KafkaProducer<String, String> kafkaProducer = null;
 
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
         IntStream.generate(() -> random.nextInt(100_000)).mapToObj(Objects::toString).forEach(i -> {
             Utils.sleeep(100);
-            final var record = new ProducerRecord<>(TOPIC, i, "My favourite number is " + i);
-                kafkaProducer.send(record, (metadata, exception) -> {
-                    if (metadata != null) {
-                        logger.info("Message sent metadata: {}", metadata);
-                    } else {
-                        logger.error("Error ", exception);
-                    }
-                });
+            //Todo 2/2 - send message "My favourite number is " + i
             }
         );
-
-
     }
 }
