@@ -1,6 +1,5 @@
 package com.pszymczyk;
 
-import com.pszymczyk.step3.ConsumerLoopManualCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,16 +18,6 @@ public class Utils {
     }
 
     public static void wakeUpConsumer(String consumerName, ConsumerLoop consumerLoop, Thread thread) {
-        logger.info("Hello consumer {}, wakeup!", consumerName);
-        consumerLoop.wakeup();
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void wakeUpConsumer(String consumerName, ConsumerLoopManualCommit consumerLoop, Thread thread) {
         logger.info("Hello consumer {}, wakeup!", consumerName);
         consumerLoop.wakeup();
         try {
