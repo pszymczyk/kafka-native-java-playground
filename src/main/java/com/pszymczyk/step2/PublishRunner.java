@@ -1,4 +1,4 @@
-package com.pszymczyk.step1;
+package com.pszymczyk.step2;
 
 import com.pszymczyk.Utils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
 
 public class PublishRunner {
 
-    public static final String TOPIC = "step1";
+    public static final String TOPIC = "step2";
     private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
 
     public static void main(String[] args) {
@@ -31,7 +31,7 @@ public class PublishRunner {
 
         IntStream.generate(() -> random.nextInt(100_000)).mapToObj(Objects::toString).forEach(i -> {
             Utils.sleeep(100);
-            final var record = new ProducerRecord<String, String>(TOPIC, "My favourite number is " + i);
+            final var record = new ProducerRecord<>(TOPIC, i, "My favourite number is " + i);
                 kafkaProducer.send(record, (metadata, exception) -> {
                     if (metadata != null) {
                         logger.info("Message sent metadata: {}", metadata);

@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import static com.pszymczyk.Utils.wakeUpConsumer;
 
 @SuppressWarnings("Duplicates")
-public class Step2Runner {
+public class SubscribeRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(Step2Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubscribeRunner.class);
 
     public static void main(String[] args) {
         var groupId = "step2";
