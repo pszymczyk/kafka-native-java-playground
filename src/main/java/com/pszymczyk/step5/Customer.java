@@ -1,4 +1,4 @@
-package com.pszymczyk.step44;
+package com.pszymczyk.step5;
 
 public class Customer {
 

@@ -1,5 +1,6 @@
-package com.pszymczyk.step44;
+package com.pszymczyk.step55;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -7,29 +8,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
 @SuppressWarnings("Duplicates")
-public class ConsumerLoopWithCustomDeserializer {
+public class FirstLevelCacheBackedByKafka {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConsumerLoopWithCustomDeserializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(FirstLevelCacheBackedByKafka.class);
+    private static final Map<String, String> cache = new HashMap<>();
 
-    private final KafkaConsumer<String, Customer> consumer;
+    private final KafkaConsumer<String, String> consumer;
     private final String topic;
 
-    public ConsumerLoopWithCustomDeserializer(String groupId, String topic) {
+    public FirstLevelCacheBackedByKafka(String topic) {
         this.topic = topic;
         var props = new Properties();
         props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(GROUP_ID_CONFIG, groupId);
+        props.put(GROUP_ID_CONFIG, "step5_" + Optional.ofNullable(System.getProperty("INSTANCE_ID")).orElse("0"));
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, CustomDeserializer.class.getName());
-        props.put(SESSION_TIMEOUT_MS_CONFIG, 5000);
+        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         this.consumer = new KafkaConsumer<>(props);
     }
 
@@ -39,12 +37,8 @@ public class ConsumerLoopWithCustomDeserializer {
         try {
             while (true) {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                for (var record : records) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("partition", record.partition());
-                    data.put("offset", record.offset());
-                    data.put("value", record.value());
-                    logger.info("ConsumerRecord: {}", data);
+                for (ConsumerRecord<String, String> record : records) {
+                    cache.put(record.key(), record.value());
                 }
             }
         } catch (WakeupException wakeupException) {
@@ -54,6 +48,10 @@ public class ConsumerLoopWithCustomDeserializer {
             consumer.close();
             logger.info("Kafka consumer closed.");
         }
+    }
+
+    public static Map<String, String> getCachedItems() {
+        return Map.copyOf(cache);
     }
 
     public void wakeup() {
