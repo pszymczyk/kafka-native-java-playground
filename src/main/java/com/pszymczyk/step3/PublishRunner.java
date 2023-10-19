@@ -24,8 +24,7 @@ public class PublishRunner {
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.PARTITIONER_CLASS_CONFIG, PositiveNegativePartitioner.class);
-        producerProperties.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, MetadataEnrichmentInterceptor.class.getName());
+        //TODO 1/1 register partitioner and interceptor
         final var kafkaProducer = new KafkaProducer<String, String>(producerProperties);
 
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
