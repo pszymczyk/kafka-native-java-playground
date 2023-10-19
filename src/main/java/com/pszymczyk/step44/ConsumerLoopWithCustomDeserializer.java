@@ -1,4 +1,4 @@
-package com.pszymczyk.step4;
+package com.pszymczyk.step44;
 
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;

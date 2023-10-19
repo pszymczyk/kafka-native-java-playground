@@ -1,4 +1,4 @@
-package com.pszymczyk.step4;
+package com.pszymczyk.step44;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
