@@ -31,7 +31,8 @@ public class PublishRunner {
 
         IntStream.generate(() -> random.nextInt(100_000)).mapToObj(Objects::toString).forEach(i -> {
             Utils.sleeep(100);
-            final var record = new ProducerRecord<>(TOPIC, i, "My favourite number is " + i);
+            //TODO 1/1 create producer record where key:${randomNumber}|value:My favourite number is ${randomNumber}
+            ProducerRecord<String, String> record = null;
                 kafkaProducer.send(record, (metadata, exception) -> {
                     if (metadata != null) {
                         logger.info("Message sent metadata: {}", metadata);
