@@ -3,6 +3,11 @@ package com.pszymczyk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Random;
 
 public class Utils {
@@ -32,6 +37,14 @@ public class Utils {
             Thread.sleep(ms);
         } catch (InterruptedException e) {
             logger.error("Sleep exception...", e);
+        }
+    }
+
+    public static List<String> readLines(String path) {
+        try {
+            return Files.readAllLines(Path.of(Utils.class.getClassLoader().getResource(path).toURI()));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
