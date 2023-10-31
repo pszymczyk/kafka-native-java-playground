@@ -13,7 +13,8 @@ public class Step9Runner {
         String outputTopic = "loan-application-decisions";
         String groupId = "step9";
 
-        var consumer = new LoanApplicationProcess(inputTopic, outputTopic, groupId, new DebtorsRepository() {});
+        var consumer = new LoanApplicationProcess(inputTopic, outputTopic, groupId, new DebtorsRepository() {
+        });
         var kafkaConsumerThread = new Thread(consumer::start, "kafka-consumer-thread");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -22,7 +23,7 @@ public class Step9Runner {
             try {
                 kafkaConsumerThread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Exception during application close.", e);
             }
         }, "shutdown-hook-thread"));
 

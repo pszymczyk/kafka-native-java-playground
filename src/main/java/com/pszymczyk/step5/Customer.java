@@ -1,6 +1,6 @@
 package com.pszymczyk.step5;
 
-public class Customer {
+class Customer {
 
     private String name;
     private String age;

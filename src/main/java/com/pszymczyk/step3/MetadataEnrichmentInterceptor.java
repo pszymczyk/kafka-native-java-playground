@@ -10,11 +10,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 
-public class MetadataEnrichmentInterceptor implements ProducerInterceptor<String, String> {
+class MetadataEnrichmentInterceptor implements ProducerInterceptor<String, String> {
 
     @Override
     public ProducerRecord<String, String> onSend(ProducerRecord<String, String> producerRecord) {
-        producerRecord.headers().add(new RecordHeader("local_time", LocalDateTime.now(ZoneId.of("Canada/Yukon")).toString().getBytes(StandardCharsets.UTF_8)));
+        producerRecord.headers().add(new RecordHeader("local_time",
+            LocalDateTime.now(ZoneId.of("Canada/Yukon")).toString().getBytes(StandardCharsets.UTF_8)));
         producerRecord.headers().add(new RecordHeader("source", "Step3_microservice".getBytes(StandardCharsets.UTF_8)));
         return producerRecord;
     }

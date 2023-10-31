@@ -1,4 +1,4 @@
-package com.pszymczyk.tx1;
+package com.pszymczyk.tx2;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

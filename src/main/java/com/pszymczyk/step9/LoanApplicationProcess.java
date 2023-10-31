@@ -1,7 +1,10 @@
 package com.pszymczyk.step9;
 
 import com.pszymczyk.Utils;
-import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -89,14 +92,14 @@ public class LoanApplicationProcess {
 
     private static Map<TopicPartition, OffsetAndMetadata> getOffsets(ConsumerRecord<String, LoanApplicationRequest> record) {
         return Map.of(new TopicPartition(record.topic(), record.partition()),
-                new OffsetAndMetadata(record.offset() + 1));
+            new OffsetAndMetadata(record.offset() + 1));
     }
 
     private LoanApplicationDecision processApplication(LoanApplicationRequest loanApplicationRequest) {
         LoanApplicationDecision loanApplicationDecision;
         if (debtorsRepository.getDebtors().contains(loanApplicationRequest.getRequester())) {
             loanApplicationDecision = submitDecision(loanApplicationRequest.getAmount().multiply(new BigDecimal("0.5")),
-                    loanApplicationRequest.getRequester());
+                loanApplicationRequest.getRequester());
         } else if (debtorsRepository.getBlackList().contains(loanApplicationRequest.getRequester())) {
             loanApplicationDecision = submitDecision(BigDecimal.ZERO, loanApplicationRequest.getRequester());
         } else {

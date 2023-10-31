@@ -3,8 +3,6 @@ package com.pszymczyk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -16,7 +14,7 @@ public class Utils {
 
     public static void failSometimes() {
         Random rand = new Random();
-        int randomNum = rand.nextInt(0,9) ;
+        int randomNum = rand.nextInt(0, 9);
         if (randomNum == 2) {
             throw new RuntimeException("Random number 2 = exception!");
         }
@@ -28,7 +26,8 @@ public class Utils {
         try {
             thread.join();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error("Consumer waking up exception.", e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -36,7 +35,8 @@ public class Utils {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException e) {
-            logger.error("Sleep exception...", e);
+            logger.error("Sleeping exception.", e);
+            throw new RuntimeException(e);
         }
     }
 

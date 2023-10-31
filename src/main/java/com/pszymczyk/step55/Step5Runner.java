@@ -19,7 +19,7 @@ public class Step5Runner {
             try {
                 kafkaConsumerThread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Exception during application close.", e);
             }
         }, "shutdown-hook-thread"));
 
@@ -28,11 +28,11 @@ public class Step5Runner {
         logger.info("Kafka consumer thread started.");
 
         while (true) {
-            logger.info("Cache: {}",FirstLevelCacheBackedByKafka.getCachedItems());
+            logger.info("Cache: {}", FirstLevelCacheBackedByKafka.getCachedItems());
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Exception during application close.", e);
             }
         }
     }

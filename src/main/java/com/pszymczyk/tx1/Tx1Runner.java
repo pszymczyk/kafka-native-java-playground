@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-public class Tx1Runner {
-    private static final Logger logger = LoggerFactory.getLogger(Tx1Runner.class);
+class Tx1Runner {
 
+    private static final Logger logger = LoggerFactory.getLogger(Tx1Runner.class);
 
     public static void main(String[] args) {
         var topic = "tx1";

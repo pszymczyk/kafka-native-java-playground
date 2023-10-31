@@ -5,7 +5,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CustomDeserializer implements Deserializer<Customer> {
+class CustomDeserializer implements Deserializer<Customer> {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomDeserializer.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();

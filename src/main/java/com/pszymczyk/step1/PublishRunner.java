@@ -13,9 +13,9 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-public class PublishRunner {
+class PublishRunner {
 
-    public static final String TOPIC = "step1";
+    private static final String TOPIC = "step1";
     private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
 
     public static void main(String[] args) {
@@ -30,8 +30,8 @@ public class PublishRunner {
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
         IntStream.generate(() -> random.nextInt(100_000)).mapToObj(Objects::toString).forEach(i -> {
-            Utils.sleeep(100);
-            final var record = new ProducerRecord<String, String>(TOPIC, "My favourite number is " + i);
+                Utils.sleeep(100);
+                final var record = new ProducerRecord<String, String>(TOPIC, "My favourite number is " + i);
                 kafkaProducer.send(record, (metadata, exception) -> {
                     if (metadata != null) {
                         logger.info("Message sent metadata: {}", metadata);
@@ -41,7 +41,5 @@ public class PublishRunner {
                 });
             }
         );
-
-
     }
 }

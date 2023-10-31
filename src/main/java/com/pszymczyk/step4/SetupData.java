@@ -8,7 +8,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.List;
 import java.util.Properties;
 
-public class SetupData {
+class SetupData {
 
     public static final String TOPIC = "step4";
 
@@ -21,7 +21,7 @@ public class SetupData {
         "And frightened Miss Muffet away."
     );
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
         final var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -31,7 +31,7 @@ public class SetupData {
 
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
-        for (var line: littleMissMuffet) {
+        for (var line : littleMissMuffet) {
             kafkaProducer.send(new ProducerRecord<>(TOPIC, 0, null, line)).get();
         }
     }
