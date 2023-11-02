@@ -11,16 +11,15 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
-import java.util.stream.IntStream;
 
 class PublishRunner {
 
     public static final String TOPIC = "step2";
     private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
+    private static final Random random = new Random();
 
     public static void main(String[] args) {
 
-        final var random = new Random();
         final var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -29,7 +28,7 @@ class PublishRunner {
 
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
-        IntStream.generate(() -> random.nextInt(100_000)).mapToObj(Objects::toString).forEach(i -> {
+        random.ints(0, 100_000).mapToObj(Objects::toString).forEach(i -> {
                 Utils.sleeep(100);
                 final var record = new ProducerRecord<>(TOPIC, i, "My favourite number is " + i);
                 kafkaProducer.send(record, (metadata, exception) -> {

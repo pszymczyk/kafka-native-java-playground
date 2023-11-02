@@ -26,26 +26,18 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZE
 class Tx2Runner {
 
     private static final Logger logger = LoggerFactory.getLogger(Tx2Runner.class);
+    private static final String inputTopic = "tx2-input";
+    private static final String outputTopic = "tx2-output";
+    private static final String groupId = "tx2-input";
 
     public static void main(String[] args) {
-        var inputTopic = "tx2-input";
-        var outputTopic = "tx2-output";
-        var groupId = "tx2-input";
 
-        final var props = new Properties();
-        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(GROUP_ID_CONFIG, groupId);
-        props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        final var kafkaConsumer = new KafkaConsumer<String, String>(props);
+        final var kafkaConsumer = createKafkaConsumer(groupId);
+        final var kafkaProducer = createKafkaProducer();
+        registerShutdownHook(kafkaProducer, kafkaConsumer);
 
-        final var producerProperties = new Properties();
-        producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BusinessTransactionSerializer.class);
-        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "Tx2Runner_mb-pro");
-        final var kafkaProducer = new KafkaProducer<String, BusinessTransaction>(producerProperties);
         kafkaProducer.initTransactions();
+
         kafkaConsumer.subscribe(List.of(inputTopic));
 
         while (true) {
@@ -94,5 +86,39 @@ class Tx2Runner {
                 }
             }
         }
+    }
+
+    private static KafkaConsumer<String, String> createKafkaConsumer(String groupId) {
+        final var consumerProperties = new Properties();
+        consumerProperties.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        consumerProperties.put(GROUP_ID_CONFIG, groupId);
+        consumerProperties.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        consumerProperties.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        final var kafkaConsumer = new KafkaConsumer<String, String>(consumerProperties);
+        return kafkaConsumer;
+    }
+
+    private static KafkaProducer<String, BusinessTransaction> createKafkaProducer() {
+        final var producerProperties = new Properties();
+        producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BusinessTransactionSerializer.class);
+        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "Tx2Runner_mb-pro");
+        final var kafkaProducer = new KafkaProducer<String, BusinessTransaction>(producerProperties);
+        return kafkaProducer;
+    }
+
+    private static void registerShutdownHook(KafkaProducer<String, BusinessTransaction> kafkaProducer, KafkaConsumer<String, String> kafkaConsumer) {
+        final var mainThread = Thread.currentThread();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            kafkaProducer.close();
+            logger.info("Hello Kafka consumer, wakeup!");
+            kafkaConsumer.wakeup();
+            try {
+                mainThread.join();
+            } catch (InterruptedException e) {
+                logger.error("Exception during application close.", e);
+            }
+        }, "shutdown-hook-thread"));
     }
 }
