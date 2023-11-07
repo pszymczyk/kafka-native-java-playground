@@ -17,8 +17,10 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
@@ -32,7 +34,7 @@ class Tx2Runner {
 
     public static void main(String[] args) {
 
-        final var kafkaConsumer = createKafkaConsumer(groupId);
+        final var kafkaConsumer = createKafkaConsumer();
         final var kafkaProducer = createKafkaProducer();
         registerShutdownHook(kafkaProducer, kafkaConsumer);
 
@@ -51,7 +53,7 @@ class Tx2Runner {
                     String buyer = split[1];
                     String seller = split[2];
                     String stock = split[3];
-                    int number = Integer.valueOf(split[4]);
+                    int number = Integer.parseInt(split[4]);
 
                     kafkaProducer.sendOffsetsToTransaction(Map.of(new TopicPartition(record.topic(), record.partition()),
                         new OffsetAndMetadata(record.offset())), kafkaConsumer.groupMetadata());
@@ -68,7 +70,7 @@ class Tx2Runner {
 
                     Utils.failSometimes();
 
-                    ProducerRecord<String, BusinessTransaction> sell = new ProducerRecord<>(outputTopic, buyer, BusinessTransaction.sell(seller,
+                    ProducerRecord<String, BusinessTransaction> sell = new ProducerRecord<>(outputTopic, seller, BusinessTransaction.sell(seller,
                         stock, number));
                     kafkaProducer.send(sell, (metadata, exception) -> {
                         if (metadata != null) {
@@ -88,12 +90,13 @@ class Tx2Runner {
         }
     }
 
-    private static KafkaConsumer<String, String> createKafkaConsumer(String groupId) {
+    private static KafkaConsumer<String, String> createKafkaConsumer() {
         final var consumerProperties = new Properties();
         consumerProperties.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         consumerProperties.put(GROUP_ID_CONFIG, groupId);
         consumerProperties.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProperties.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        consumerProperties.put(ENABLE_AUTO_COMMIT_CONFIG, false);
         final var kafkaConsumer = new KafkaConsumer<String, String>(consumerProperties);
         return kafkaConsumer;
     }
@@ -103,7 +106,7 @@ class Tx2Runner {
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BusinessTransactionSerializer.class);
-        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "Tx2Runner_mb-pro");
+        producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "Tx2Runner_" + UUID.randomUUID());
         final var kafkaProducer = new KafkaProducer<String, BusinessTransaction>(producerProperties);
         return kafkaProducer;
     }
