@@ -7,7 +7,7 @@ import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
-class PositiveNegativePartitioner implements Partitioner {
+public class PositiveNegativePartitioner implements Partitioner {
 
     @Override
     public int partition(String topic, Object key, byte[] keyBytes, Object value, byte[] valueBytes, Cluster cluster) {

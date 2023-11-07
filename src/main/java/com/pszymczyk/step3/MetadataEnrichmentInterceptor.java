@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 
-class MetadataEnrichmentInterceptor implements ProducerInterceptor<String, String> {
+public class MetadataEnrichmentInterceptor implements ProducerInterceptor<String, String> {
 
     @Override
     public ProducerRecord<String, String> onSend(ProducerRecord<String, String> producerRecord) {
