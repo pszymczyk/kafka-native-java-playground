@@ -8,6 +8,7 @@ node_modules/
 dist/
 
 *.iml
+*.code-workspace
 
 # Compiled Java class files
 *.class
@@ -48,3 +49,4 @@ Thumbs.db
 *.mov
 *.wmv
 
+.vscode/*

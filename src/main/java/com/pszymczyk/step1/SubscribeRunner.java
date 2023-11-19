@@ -1,4 +1,4 @@
-package com.pszymczyk;
+package com.pszymczyk.step1;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -17,50 +17,49 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 
-@SuppressWarnings("Duplicates")
-public class ConsumerLoop {
+class SubscribeRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConsumerLoop.class);
+    private static final String GROUP_ID = "step1";
+    private static final String TOPIC = "step1";
+    private static final Logger logger = LoggerFactory.getLogger(SubscribeRunner.class);
 
-    private final KafkaConsumer<String, String> consumer;
-    private final String topic;
+    public static void main(String[] args) {
 
-    public ConsumerLoop(String groupId, String topic) {
-        this.topic = topic;
-        var props = new Properties();
+        final var props = new Properties();
         props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(GROUP_ID_CONFIG, groupId);
+        props.put(GROUP_ID_CONFIG, GROUP_ID);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        this.consumer = new KafkaConsumer<>(props);
-    }
+        final var kafkaConsumer = new KafkaConsumer<String, String>(props);
 
-    public void start() {
-        consumer.subscribe(List.of(topic));
+        final var mainThread = Thread.currentThread();
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            logger.info("Hello Kafka consumer, wakeup!");
+            kafkaConsumer.wakeup();
+            try {
+                mainThread.join();
+            } catch (InterruptedException e) {
+                logger.error("Exception during application close.", e);
+            }
+        }, "shutdown-hook-thread"));
+
+
+        kafkaConsumer.subscribe(List.of(TOPIC));
 
         try {
             while (true) {
-                var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                var records = kafkaConsumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (ConsumerRecord<String, String> record : records) {
-                    logger.info("Consumer thread: {}, ConsumerRecord: {}",
-                        Thread.currentThread().getName(),
-                        Map.of(
-                            "partition", record.partition(),
-                            "offset", record.offset(),
-                            "value", record.value()));
+                    logger.info("ConsumerRecord: {}", Map.of("partition", record.partition(), "offset", record.offset(), "key", record.key(),
+                        "value", record.value()));
                 }
             }
         } catch (WakeupException wakeupException) {
             logger.info("Handling WakeupException.");
         } finally {
             logger.info("Closing Kafka consumer...");
-            consumer.close();
+            kafkaConsumer.close();
             logger.info("Kafka consumer closed.");
         }
-
-    }
-
-    public void wakeup() {
-        consumer.wakeup();
     }
 }

@@ -6,18 +6,17 @@ import org.slf4j.LoggerFactory;
 
 import static com.pszymczyk.Utils.wakeUpConsumer;
 
-@SuppressWarnings("Duplicates")
-public class Step2Runner {
+class SubscribeRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(Step2Runner.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubscribeRunner.class);
 
     public static void main(String[] args) {
         var groupId = "step2";
         var topic = "step2";
 
-        var consumer0 = new ConsumerLoop(0, groupId, topic);
-        var consumer1 = new ConsumerLoop(1, groupId, topic);
-        var consumer2 = new ConsumerLoop(2, groupId, topic);
+        var consumer0 = new ConsumerLoop(groupId, topic);
+        var consumer1 = new ConsumerLoop(groupId, topic);
+        var consumer2 = new ConsumerLoop(groupId, topic);
 
         var consumer0Thread = new Thread(consumer0::start, "consumer-0-thread");
         var consumer1Thread = new Thread(consumer1::start, "consumer-1-thread");

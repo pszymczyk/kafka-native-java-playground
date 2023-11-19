@@ -2,7 +2,6 @@ package com.pszymczyk.step5;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -33,8 +32,15 @@ public class FirstLevelCacheBackedByKafka {
     }
 
     public void start() {
+        consumer.subscribe(List.of(topic));
+
         try {
-            throw new RuntimeException("TODO");
+            while (true) {
+                var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                for (ConsumerRecord<String, String> record : records) {
+                    cache.put(record.key(), record.value());
+                }
+            }
         } catch (WakeupException wakeupException) {
             logger.info("Handling WakeupException.");
         } finally {
