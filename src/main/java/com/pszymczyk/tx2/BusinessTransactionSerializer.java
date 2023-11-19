@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.serialization.Serializer;
 
-class BusinessTransactionSerializer implements Serializer<BusinessTransaction> {
+public class BusinessTransactionSerializer implements Serializer<BusinessTransaction> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 

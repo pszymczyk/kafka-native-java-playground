@@ -43,7 +43,7 @@ class Tx1Runner {
                     } else {
                         logger.error("Record sending failed. ", exception);
                     }
-                });
+                }).get();
 
                 Utils.failSometimes();
 
@@ -55,7 +55,7 @@ class Tx1Runner {
                     } else {
                         logger.error("Record sending failed. ", exception);
                     }
-                });
+                }).get();
 
                 kafkaProducer.commitTransaction();
             } catch (Exception e) {
