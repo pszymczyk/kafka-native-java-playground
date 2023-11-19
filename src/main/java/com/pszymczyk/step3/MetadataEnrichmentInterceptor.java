@@ -1,4 +1,4 @@
-package com.pszymczyk.step8;
+package com.pszymczyk.step3;
 
 import org.apache.kafka.clients.producer.ProducerInterceptor;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -14,8 +14,10 @@ public class MetadataEnrichmentInterceptor implements ProducerInterceptor<String
 
     @Override
     public ProducerRecord<String, String> onSend(ProducerRecord<String, String> producerRecord) {
-        producerRecord.headers().add(new RecordHeader("local_time", LocalDateTime.now(ZoneId.of("Canada/Yukon")).toString().getBytes(StandardCharsets.UTF_8)));
-        producerRecord.headers().add(new RecordHeader("source", "Step8_microservice".getBytes(StandardCharsets.UTF_8)));
+        producerRecord.headers().add(
+            new RecordHeader("local_time", LocalDateTime.now(ZoneId.of("Canada/Yukon")).toString().getBytes(StandardCharsets.UTF_8)));
+        producerRecord.headers().add(
+            new RecordHeader("source", "Step3_microservice".getBytes(StandardCharsets.UTF_8)));
         return producerRecord;
     }
 

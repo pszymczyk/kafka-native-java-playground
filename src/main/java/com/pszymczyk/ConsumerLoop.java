@@ -2,7 +2,6 @@ package com.pszymczyk;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.MetricName;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -13,7 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 
 @SuppressWarnings("Duplicates")
 public class ConsumerLoop {
@@ -41,11 +43,11 @@ public class ConsumerLoop {
                 var records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (ConsumerRecord<String, String> record : records) {
                     logger.info("Consumer thread: {}, ConsumerRecord: {}",
-                            Thread.currentThread().getName(),
-                            Map.of(
-                                    "partition", record.partition(),
-                                    "offset", record.offset(),
-                                    "value", record.value()));
+                        Thread.currentThread().getName(),
+                        Map.of(
+                            "partition", record.partition(),
+                            "offset", record.offset(),
+                            "value", record.value()));
                 }
             }
         } catch (WakeupException wakeupException) {
