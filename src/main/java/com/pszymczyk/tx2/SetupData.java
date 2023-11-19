@@ -1,4 +1,4 @@
-package com.pszymczyk.step2;
+package com.pszymczyk.tx2;
 
 import com.pszymczyk.Utils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -8,17 +8,14 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.Properties;
-import java.util.Random;
 
-class PublishRunner {
+class SetupData {
 
-    public static final String TOPIC = "step2";
-    private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
-    private static final Random random = new Random();
+    private static final Logger logger = LoggerFactory.getLogger(SetupData.class);
 
     public static void main(String[] args) {
+        var topic = "tx2-input";
 
         final var producerProperties = new Properties();
         producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
@@ -26,19 +23,21 @@ class PublishRunner {
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         final var kafkaProducer = new KafkaProducer<String, String>(producerProperties);
 
-        Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
-
-        random.ints(0, 100_000).mapToObj(Objects::toString).forEach(i -> {
-                Utils.sleeep(100);
-                final var record = new ProducerRecord<>(TOPIC, i, "My favourite number is " + i);
-                kafkaProducer.send(record, (metadata, exception) -> {
+        Utils.readLines("warszawa-krucza49_24-10-2023.csv").forEach(line -> {
+            try {
+                kafkaProducer.send(new ProducerRecord<>(topic, line), (metadata, exception) -> {
                     if (metadata != null) {
-                        logger.info("Message sent metadata: {}", metadata);
+                        logger.info("Record sent, {}.", metadata);
                     } else {
-                        logger.error("Error ", exception);
+                        logger.error("Record sending failed. ", exception);
                     }
-                });
+                }).get();
+            } catch (Exception exception) {
+                logger.error("Record sending failed. ", exception);
+                throw new RuntimeException(exception);
             }
-        );
+        });
+
+        kafkaProducer.close();
     }
 }

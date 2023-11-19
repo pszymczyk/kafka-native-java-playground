@@ -22,7 +22,7 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_
 import static org.apache.kafka.clients.consumer.ConsumerConfig.MAX_POLL_RECORDS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 
-public class SubscribeRunner {
+class SubscribeRunner {
 
     private static final String GROUP_ID = "step4";
     private static final List<TopicPartition> partitions = List.of(new TopicPartition("step4", 0));
@@ -38,7 +38,7 @@ public class SubscribeRunner {
         props.put(ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(AUTO_OFFSET_RESET_CONFIG, OffsetResetStrategy.EARLIEST.toString());
         props.put(MAX_POLL_RECORDS_CONFIG, 1);
-        final var kafkaConsumer = new KafkaConsumer<String, String>(props);;
+        final var kafkaConsumer = new KafkaConsumer<String, String>(props);
 
         final var mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -47,7 +47,7 @@ public class SubscribeRunner {
             try {
                 mainThread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("Exception during application close.", e);
             }
         }, "shutdown-hook-thread"));
 
