@@ -82,9 +82,10 @@ class Tx2Runner {
 
                     kafkaProducer.commitTransaction();
                 } catch (Exception exception) {
+                    logger.error("Exception during message processing.", exception);
                     kafkaProducer.abortTransaction();
                     kafkaConsumer.seek(new TopicPartition(record.topic(), record.partition()), record.offset());
-                    logger.error("Exception during message processing.", exception);
+                    break;
                 }
             }
         }
