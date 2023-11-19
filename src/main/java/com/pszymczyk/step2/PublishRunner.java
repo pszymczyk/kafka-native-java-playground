@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 
-public class PublishRunner {
+class PublishRunner {
 
     public static final String TOPIC = "step2";
     private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
