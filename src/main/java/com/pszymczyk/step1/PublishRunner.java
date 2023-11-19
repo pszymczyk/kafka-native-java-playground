@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Objects;
 import java.util.Random;
 
-public class PublishRunner {
+class PublishRunner {
 
     public static final String TOPIC = "step1";
     private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
