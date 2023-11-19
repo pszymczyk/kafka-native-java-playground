@@ -1,4 +1,4 @@
-package com.pszymczyk.tx1;
+package com.pszymczyk.tx2;
 
 record BusinessTransaction(String type, String user, String stock, int number) {
     public static String BUY = "buy";
