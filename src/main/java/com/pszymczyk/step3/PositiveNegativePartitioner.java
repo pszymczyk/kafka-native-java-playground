@@ -16,7 +16,7 @@ public class PositiveNegativePartitioner implements Partitioner {
 
         if (valueAsString.equals("0")) {
             return 0;
-        } else if (valueAsString.startsWith("-")){
+        } else if (valueAsString.startsWith("-")) {
             return 1;
         } else {
             return 2;

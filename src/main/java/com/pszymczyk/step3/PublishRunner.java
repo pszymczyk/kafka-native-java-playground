@@ -12,10 +12,10 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 
-public class PublishRunner {
+class PublishRunner {
 
     public static final String TOPIC = "step3";
-    private static final Logger logger = LoggerFactory.getLogger(com.pszymczyk.step2.PublishRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
 
     public static void main(String[] args) {
 
@@ -30,7 +30,7 @@ public class PublishRunner {
 
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
-        random.ints(-100,100).mapToObj(Objects::toString).forEach(i ->{
+        random.ints(-100, 100).mapToObj(Objects::toString).forEach(i -> {
             Utils.sleeep(100);
             final var record = new ProducerRecord<String, String>(TOPIC, i);
             kafkaProducer.send(record, (metadata, exception) -> {
