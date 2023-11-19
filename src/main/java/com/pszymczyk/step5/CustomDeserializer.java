@@ -1,4 +1,4 @@
-package com.pszymczyk.step4;
+package com.pszymczyk.step5;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.common.serialization.Deserializer;

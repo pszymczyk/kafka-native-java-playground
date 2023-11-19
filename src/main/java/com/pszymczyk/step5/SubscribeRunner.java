@@ -1,4 +1,4 @@
-package com.pszymczyk.step1;
+package com.pszymczyk.step5;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
@@ -19,8 +18,8 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZE
 
 class SubscribeRunner {
 
-    private static final String GROUP_ID = "step1";
-    private static final String TOPIC = "step1";
+    private static final String GROUP_ID = "step5";
+    private static final String TOPIC = "step5";
     private static final Logger logger = LoggerFactory.getLogger(SubscribeRunner.class);
 
     public static void main(String[] args) {
@@ -29,8 +28,8 @@ class SubscribeRunner {
         props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(GROUP_ID_CONFIG, GROUP_ID);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        final var kafkaConsumer = new KafkaConsumer<String, String>(props);
+        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, CustomDeserializer.class.getName());
+        final var kafkaConsumer = new KafkaConsumer<String, Customer>(props);
 
         final var mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -43,15 +42,13 @@ class SubscribeRunner {
             }
         }, "shutdown-hook-thread"));
 
-
         kafkaConsumer.subscribe(List.of(TOPIC));
 
         try {
             while (true) {
                 var records = kafkaConsumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-                for (ConsumerRecord<String, String> record : records) {
-                    logger.info("ConsumerRecord: {}", Map.of("partition", record.partition(), "offset", record.offset(), "key", record.key(),
-                        "value", record.value()));
+                for (ConsumerRecord<String, Customer> record : records) {
+                    logger.info("{}", record.value());
                 }
             }
         } catch (WakeupException wakeupException) {

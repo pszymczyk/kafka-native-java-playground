@@ -6,8 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import static com.pszymczyk.Utils.wakeUpConsumer;
 
-@SuppressWarnings("Duplicates")
-public class SubscribeRunner {
+class SubscribeRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(SubscribeRunner.class);
 
