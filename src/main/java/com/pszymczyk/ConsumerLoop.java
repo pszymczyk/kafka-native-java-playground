@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
@@ -47,6 +48,7 @@ public class ConsumerLoop {
                         Map.of(
                             "partition", record.partition(),
                             "offset", record.offset(),
+                            "key", Objects.toString(record.key()),
                             "value", record.value()));
                 }
             }
