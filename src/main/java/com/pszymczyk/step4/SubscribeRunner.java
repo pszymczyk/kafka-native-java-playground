@@ -46,7 +46,7 @@ public class SubscribeRunner {
             }
         }, "shutdown-hook-thread"));
 
-        //TODO 2/5 Assign to topic step4 partition 0
+        //TODO 2/5 Subscribe to topic step4 partition 0
 
         try {
             while (true) {
