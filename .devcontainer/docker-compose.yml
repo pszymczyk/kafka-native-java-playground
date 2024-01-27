@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    command: sleep infinity
   kafka:
     image: 'bitnami/kafka:latest'
     ports:
