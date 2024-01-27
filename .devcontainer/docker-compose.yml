@@ -1,5 +1,15 @@
 version: "3"
 services:
+  app:
+    container_name: javadev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ../..:/workspaces:cached
+      - maven-cache:/home/vscode/.m2/repository
+      - npm-cache:/home/.npm
+    command: sleep infinity
   kafka:
     image: 'bitnami/kafka:latest'
     ports:

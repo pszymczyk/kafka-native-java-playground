@@ -1,5 +1,11 @@
 {
   "name": "kafka-native-java-playground",
   "dockerComposeFile": "docker-compose.yml",
-  "service": "kafka"
+  "service": "app",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1.3.0": {
+      "version": "21",
+      "installMaven": "true"
+    }
+  }
 }
