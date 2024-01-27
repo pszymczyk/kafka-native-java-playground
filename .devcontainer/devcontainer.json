@@ -1,0 +1,12 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/java:1-21-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1.3.0": {
+      "version": "21",
+      "installMaven": "true",
+    }
+  },
+  "name": "kafka-native-java-playground",
+  "dockerComposeFile": "compose.yml",
+  "service": "kafka"
+}

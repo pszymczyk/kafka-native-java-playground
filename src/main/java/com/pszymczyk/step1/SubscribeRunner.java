@@ -49,7 +49,7 @@ class SubscribeRunner {
 
         try {
             while (true) {
-                var records = kafkaConsumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+                var records = kafkaConsumer.poll(Duration.ofSeconds(0));
                 for (ConsumerRecord<String, String> record : records) {
                     logger.info("ConsumerRecord: {}", Map.of("partition", record.partition(), "offset", record.offset(), "key", Objects.toString(record.key()),
                         "value", record.value()));
