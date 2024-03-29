@@ -24,7 +24,7 @@ class PublishRunner {
     public static void main(String[] args) {
 
         final var producerProperties = new Properties();
-        producerProperties.put(BOOTSTRAP_SERVERS_CONFIG, "kafka-broker:9092");
+        producerProperties.put(BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         producerProperties.put(KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         final var kafkaProducer = new KafkaProducer<String, String>(producerProperties);

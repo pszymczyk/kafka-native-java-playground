@@ -27,7 +27,7 @@ class SubscribeRunner {
     public static void main(String[] args) {
 
         final var props = new Properties();
-        props.put(BOOTSTRAP_SERVERS_CONFIG, "kafka-broker:9092");
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         props.put(GROUP_ID_CONFIG, GROUP_ID);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
