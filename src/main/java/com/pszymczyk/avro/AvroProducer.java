@@ -15,17 +15,7 @@ public class AvroProducer {
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
-        props.put("schema.registry.url", "http://localhost:8081");
 
-        KafkaProducer<String, Pageview> producer = new KafkaProducer<>(props);
-
-        Pageview pageview = new Pageview();
-        pageview.setIsSpecial(true);
-        pageview.setUrl("http://szkoleniekafka.pl");
-        pageview.setCustomerId("pszymczyk");
-        producer.send(new ProducerRecord<>("pageviews", pageview)).get();
-
-        producer.close();
+        String topic = "pageviews";
     }
 }

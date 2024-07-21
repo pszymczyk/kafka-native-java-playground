@@ -41,11 +41,6 @@
                             <goal>schema</goal>
                         </goals>
                         <configuration>
-                            <sourceDirectory>${project.basedir}/src/main/resources/avro/</sourceDirectory>
-                            <includes>
-                                <include>pageview.avsc</include>
-                            </includes>
-                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -58,9 +53,6 @@
                     <schemaRegistryUrls>
                         <param>http://localhost:8081</param>
                     </schemaRegistryUrls>
-                    <subjects>
-                        <pageviews-value>src/main/resources/avro/pageview.avsc</pageviews-value>
-                    </subjects>
                 </configuration>
                 <goals>
                     <goal>test-compatibility</goal>
