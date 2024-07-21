@@ -55,14 +55,11 @@
                 <artifactId>kafka-schema-registry-maven-plugin</artifactId>
                 <version>7.6.1</version>
                 <configuration>
-<!--                    <schemaRegistryUrls>-->
-<!--                        <param>${schemaRegistryUrl}</param>-->
-<!--                    </schemaRegistryUrls>-->
-                    <compatibilityLevels>
-                        <pageviews>FULL</pageviews>
-                    </compatibilityLevels>
+                    <schemaRegistryUrls>
+                        <param>http://localhost:8081</param>
+                    </schemaRegistryUrls>
                     <subjects>
-                        <transactions-value>src/main/resources/avro/pageview.avsc</transactions-value>
+                        <pageviews-value>src/main/resources/avro/pageview.avsc</pageviews-value>
                     </subjects>
                 </configuration>
                 <goals>
