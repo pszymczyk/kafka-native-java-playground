@@ -2,6 +2,7 @@ package com.pszymczyk.avro;
 
 
 import com.pszymczyk.avro.events.Pageview;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -26,6 +27,8 @@ public class AvroConsumer {
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "io.confluent.kafka.serializers.KafkaAvroDeserializer");
         props.put("schema.registry.url", "http://localhost:8081");
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
+        props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_VALUE_TYPE_CONFIG, Pageview.class.getName());
 
         String topic = "pageviews";
         final Consumer<String, Pageview> consumer = new KafkaConsumer<>(props);
