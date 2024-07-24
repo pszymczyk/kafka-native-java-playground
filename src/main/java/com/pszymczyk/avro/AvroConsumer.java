@@ -38,7 +38,8 @@ public class AvroConsumer {
             while (true) {
                 ConsumerRecords<String, Pageview> records = consumer.poll(1000);
                 for (ConsumerRecord<String, Pageview> record : records) {
-                    logger.info("offset = {}, key = {}, value = {}", record.offset(), record.key(), record.value());
+                    Pageview pageview = record.value();
+                    logger.info("offset = {}, key = {}, value = {}", record.offset(), record.key(), pageview);
                 }
                 if (!records.isEmpty()) {
                     break;
