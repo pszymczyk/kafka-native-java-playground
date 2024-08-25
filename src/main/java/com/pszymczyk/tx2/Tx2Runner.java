@@ -58,8 +58,8 @@ class Tx2Runner {
                     kafkaProducer.sendOffsetsToTransaction(Map.of(new TopicPartition(record.topic(), record.partition()),
                         new OffsetAndMetadata(record.offset())), kafkaConsumer.groupMetadata());
 
-                    ProducerRecord<String, BusinessTransaction> buy = new ProducerRecord<>(outputTopic, buyer, BusinessTransaction.buy(buyer, stock
-                        , number));
+                    ProducerRecord<String, BusinessTransaction> buy = new ProducerRecord<>(
+                            outputTopic, buyer, BusinessTransaction.buy(buyer, stock, number));
                     kafkaProducer.send(buy, (metadata, exception) -> {
                         if (metadata != null) {
                             logger.info("Record sent, {}.", metadata);
@@ -70,8 +70,8 @@ class Tx2Runner {
 
                     Utils.failSometimes();
 
-                    ProducerRecord<String, BusinessTransaction> sell = new ProducerRecord<>(outputTopic, seller, BusinessTransaction.sell(seller,
-                        stock, number));
+                    ProducerRecord<String, BusinessTransaction> sell = new ProducerRecord<>(
+                            outputTopic, seller, BusinessTransaction.sell(seller, stock, number));
                     kafkaProducer.send(sell, (metadata, exception) -> {
                         if (metadata != null) {
                             logger.info("Record sent, {}.", metadata);
