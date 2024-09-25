@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
@@ -26,7 +27,7 @@ class SubscribeRunner {
     public static void main(String[] args) {
 
         final var props = new Properties();
-        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         props.put(GROUP_ID_CONFIG, GROUP_ID);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -50,7 +51,7 @@ class SubscribeRunner {
             while (true) {
                 var records = kafkaConsumer.poll(Duration.ofMillis(Long.MAX_VALUE));
                 for (ConsumerRecord<String, String> record : records) {
-                    logger.info("ConsumerRecord: {}", Map.of("partition", record.partition(), "offset", record.offset(), "key", record.key(),
+                    logger.info("ConsumerRecord: {}", Map.of("partition", record.partition(), "offset", record.offset(), "key", Objects.toString(record.key()),
                         "value", record.value()));
                 }
             }
