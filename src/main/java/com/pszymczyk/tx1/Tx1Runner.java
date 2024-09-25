@@ -16,7 +16,7 @@ public class Tx1Runner {
         var topic = "tx1";
 
         final var producerProperties = new Properties();
-        producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BusinessTransactionSerializer.class);
         //TODO 1/2 Configure Kafka Producer transactions
