@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG;
@@ -28,7 +29,7 @@ public class ConsumerLoop {
     public ConsumerLoop(String groupId, String topic) {
         this.topic = topic;
         var props = new Properties();
-        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         props.put(GROUP_ID_CONFIG, groupId);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -47,6 +48,7 @@ public class ConsumerLoop {
                         Map.of(
                             "partition", record.partition(),
                             "offset", record.offset(),
+                            "key", Objects.toString(record.key()),
                             "value", record.value()));
                 }
             }

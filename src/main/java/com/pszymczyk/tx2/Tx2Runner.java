@@ -58,8 +58,8 @@ class Tx2Runner {
                     kafkaProducer.sendOffsetsToTransaction(Map.of(new TopicPartition(record.topic(), record.partition()),
                         new OffsetAndMetadata(record.offset())), kafkaConsumer.groupMetadata());
 
-                    ProducerRecord<String, BusinessTransaction> buy = new ProducerRecord<>(outputTopic, buyer, BusinessTransaction.buy(buyer, stock
-                        , number));
+                    ProducerRecord<String, BusinessTransaction> buy = new ProducerRecord<>(
+                            outputTopic, buyer, BusinessTransaction.buy(buyer, stock, number));
                     kafkaProducer.send(buy, (metadata, exception) -> {
                         if (metadata != null) {
                             logger.info("Record sent, {}.", metadata);
@@ -70,8 +70,8 @@ class Tx2Runner {
 
                     Utils.failSometimes();
 
-                    ProducerRecord<String, BusinessTransaction> sell = new ProducerRecord<>(outputTopic, seller, BusinessTransaction.sell(seller,
-                        stock, number));
+                    ProducerRecord<String, BusinessTransaction> sell = new ProducerRecord<>(
+                            outputTopic, seller, BusinessTransaction.sell(seller, stock, number));
                     kafkaProducer.send(sell, (metadata, exception) -> {
                         if (metadata != null) {
                             logger.info("Record sent, {}.", metadata);
@@ -93,7 +93,7 @@ class Tx2Runner {
 
     private static KafkaConsumer<String, String> createKafkaConsumer() {
         final var consumerProperties = new Properties();
-        consumerProperties.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        consumerProperties.put(BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         consumerProperties.put(GROUP_ID_CONFIG, groupId);
         consumerProperties.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProperties.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -104,7 +104,7 @@ class Tx2Runner {
 
     private static KafkaProducer<String, BusinessTransaction> createKafkaProducer() {
         final var producerProperties = new Properties();
-        producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, BusinessTransactionSerializer.class);
         producerProperties.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "Tx2Runner_" + UUID.randomUUID());
