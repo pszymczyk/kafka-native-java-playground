@@ -22,8 +22,8 @@ class PublishRunner {
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
         random.ints(0, 100_000).mapToObj(Objects::toString).forEach(i -> {
-            Utils.sleeep(100);
-            //Todo 2/2 - send message "My favourite number is " + i
+                Utils.sleeep(100);
+                //Todo 2/2 - send message "My favourite number is " + i
             }
         );
     }

@@ -25,6 +25,7 @@ services:
 
   console:
     image: docker.redpanda.com/redpandadata/console:latest
+    container_name: console
     restart: on-failure
     entrypoint: /bin/sh
     command: -c "echo \"$$CONSOLE_CONFIG_FILE\" > /tmp/config.yml; /app/console"

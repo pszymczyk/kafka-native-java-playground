@@ -31,7 +31,7 @@ class SubscribeRunner {
         //Todo 2/3 - subscribe
 
         try {
-        //Todo 3/3 - poll records
+            //Todo 3/3 - poll records
 
         } catch (WakeupException wakeupException) {
             logger.info("Handling WakeupException.");
