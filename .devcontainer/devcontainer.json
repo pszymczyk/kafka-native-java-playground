@@ -1,0 +1,5 @@
+{
+  "name": "kafka-native-java-playground",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app"
+}
