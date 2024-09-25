@@ -4,7 +4,6 @@ import com.pszymczyk.Utils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
@@ -25,13 +24,13 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZE
 class SubscribeRunner {
 
     private static final String GROUP_ID = "step4";
-    private static final List<TopicPartition> partitions = List.of(new TopicPartition("step4", 0));
+    private static final String TOPIC = "step4";
     private static final Logger logger = LoggerFactory.getLogger(SubscribeRunner.class);
 
     public static void main(String[] args) {
 
         final var props = new Properties();
-        props.put(BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
         props.put(GROUP_ID_CONFIG, GROUP_ID);
         props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
@@ -51,13 +50,13 @@ class SubscribeRunner {
             }
         }, "shutdown-hook-thread"));
 
-        kafkaConsumer.assign(partitions);
+        kafkaConsumer.subscribe(List.of(TOPIC));
 
         try {
             while (true) {
                 var records = kafkaConsumer.poll(Duration.ofMillis(500));
                 if (records.isEmpty()) {
-                    kafkaConsumer.seekToBeginning(partitions);
+                    kafkaConsumer.seekToBeginning(kafkaConsumer.assignment());
                 } else {
                     for (ConsumerRecord<String, String> record : records) {
                         logger.info("<===========" + record.value() + "=========>");
