@@ -28,53 +28,7 @@
         </pluginRepository>
     </pluginRepositories>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.avro</groupId>
-                <artifactId>avro-maven-plugin</artifactId>
-                <version>1.11.3</version>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>schema</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>${project.basedir}/src/main/resources/avro/</sourceDirectory>
-                            <includes>
-                                <include>pageview.avsc</include>
-                            </includes>
-                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>io.confluent</groupId>
-                <artifactId>kafka-schema-registry-maven-plugin</artifactId>
-                <version>7.6.1</version>
-                <configuration>
-                    <schemaRegistryUrls>
-                        <param>http://localhost:8081</param>
-                    </schemaRegistryUrls>
-                    <subjects>
-                        <pageviews-value>src/main/resources/avro/pageview.avsc</pageviews-value>
-                    </subjects>
-                </configuration>
-                <goals>
-                    <goal>test-compatibility</goal>
-                </goals>
-            </plugin>
-        </plugins>
-    </build>
-
     <dependencies>
-        <dependency>
-            <groupId>io.confluent</groupId>
-            <artifactId>kafka-avro-serializer</artifactId>
-            <version>7.6.1</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
