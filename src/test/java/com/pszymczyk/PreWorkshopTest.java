@@ -15,7 +15,7 @@ public class PreWorkshopTest {
     @BeforeAll
     static void setup() {
          adminClient = AdminClient.create(Map.of(
-            "bootstrap.servers", "[::1]:9092",
+            "bootstrap.servers", "localhost:9092",
             "group.id", "create-topics-admin"));
     }
 
