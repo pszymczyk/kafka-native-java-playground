@@ -1,6 +1,7 @@
 package com.pszymczyk.tx2;
 
 import com.pszymczyk.Utils;
+import org.apache.kafka.clients.consumer.ConsumerGroupMetadata;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
@@ -39,25 +40,25 @@ class Tx2Runner {
         registerShutdownHook(kafkaProducer, kafkaConsumer);
 
         kafkaProducer.initTransactions();
-
         kafkaConsumer.subscribe(List.of(inputTopic));
 
         while (true) {
+            //[0,9]
             ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(Long.MAX_VALUE));
-            for (var record : records) {
-
+            for (var record : records) {     //0
                 try {
-
                     kafkaProducer.beginTransaction();
+
                     String[] split = record.value().split(",");
                     String buyer = split[1];
                     String seller = split[2];
                     String stock = split[3];
                     int number = Integer.parseInt(split[4]);
 
-                    kafkaProducer.sendOffsetsToTransaction(Map.of(new TopicPartition(record.topic(), record.partition()),
-                        new OffsetAndMetadata(record.offset())), kafkaConsumer.groupMetadata());
-
+                    kafkaProducer.sendOffsetsToTransaction(
+                        Map.of(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset())),
+                        kafkaConsumer.groupMetadata());
+                    
                     ProducerRecord<String, BusinessTransaction> buy = new ProducerRecord<>(
                             outputTopic, buyer, BusinessTransaction.buy(buyer, stock, number));
                     kafkaProducer.send(buy, (metadata, exception) -> {
