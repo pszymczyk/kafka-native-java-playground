@@ -27,8 +27,8 @@ class Tx1Runner {
 
         Utils.readLines("warszawa-krucza49_24-10-2023.csv").forEach(line -> {
             try {
-                kafkaProducer.beginTransaction();
 
+                kafkaProducer.beginTransaction();
                 String[] split = line.split(",");
                 String buyer = split[1];
                 String seller = split[2];
