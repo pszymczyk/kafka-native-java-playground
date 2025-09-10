@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   broker1:
-    image: apache/kafka:4.1.0.0
+    image: apache/kafka:4.1.0
     hostname: broker1
     container_name: broker1
     ports:
