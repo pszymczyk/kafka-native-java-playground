@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.util.*;
 
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG;
 
 class SubscribeRunner {
 
@@ -56,7 +57,7 @@ class SubscribeRunner {
             props.put(GROUP_ID_CONFIG, groupId);
             props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
             props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-            props.put(ConsumerConfig.SHARE_ACKNOWLEDGEMENT_MODE_CONFIG, "explicit");
+            props.put(SHARE_ACKNOWLEDGEMENT_MODE_CONFIG, "explicit");
             this.consumer = new KafkaShareConsumer<>(props);
         }
 
