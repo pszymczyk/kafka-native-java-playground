@@ -34,10 +34,10 @@ class PublishRunner {
             Utils.sleeep(100);
             final var record = new ProducerRecord<String, String>(TOPIC, i);
             kafkaProducer.send(record, (metadata, exception) -> {
-                if (metadata != null) {
-                    logger.info("Message sent metadata: {}", metadata);
-                } else {
+                if (exception != null) {
                     logger.error("Error ", exception);
+                } else {
+                    logger.info("Message sent metadata: {}", metadata);
                 }
             });
         });
