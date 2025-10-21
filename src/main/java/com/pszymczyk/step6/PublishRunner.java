@@ -30,16 +30,16 @@ class PublishRunner {
         Runtime.getRuntime().addShutdownHook(new Thread(kafkaProducer::close, "shutdown-hook-thread"));
 
         random.ints(0, 100_000).mapToObj(Objects::toString).forEach(i -> {
-                Utils.sleeep(100);
-                final var record = new ProducerRecord<String, String>(TOPIC, "My favourite number is " + i);
-                kafkaProducer.send(record, (metadata, exception) -> {
-                    if (metadata != null) {
-                        logger.info("Message sent metadata: {}", metadata);
-                    } else {
-                        logger.error("Error ", exception);
-                    }
-                });
-            }
+                    Utils.sleeep(100);
+                    final var record = new ProducerRecord<String, String>(TOPIC, "My favourite number is " + i);
+                    kafkaProducer.send(record, (metadata, exception) -> {
+                        if (exception != null) {
+                            logger.error("Error ", exception);
+                        } else {
+                            logger.info("Message sent metadata: {}", metadata);
+                        }
+                    });
+                }
         );
     }
 }
