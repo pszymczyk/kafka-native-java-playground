@@ -38,10 +38,10 @@ class Tx1Runner {
                 ProducerRecord<String, BusinessTransaction> buy = new ProducerRecord<>(
                     topic, buyer, BusinessTransaction.buy(buyer, stock, number));
                 kafkaProducer.send(buy, (metadata, exception) -> {
-                    if (metadata != null) {
-                        logger.info("Record sent, {}.", metadata);
-                    } else {
+                    if (exception != null) {
                         logger.error("Record sending failed. ", exception);
+                    } else {
+                        logger.info("Record sent, {}.", metadata);
                     }
                 }).get();
 
@@ -50,10 +50,10 @@ class Tx1Runner {
                 ProducerRecord<String, BusinessTransaction> sell = new ProducerRecord<>(
                     topic, buyer, BusinessTransaction.sell(seller, stock, number));
                 kafkaProducer.send(sell, (metadata, exception) -> {
-                    if (metadata != null) {
-                        logger.info("Record sent, {}.", metadata);
-                    } else {
+                    if (exception != null) {
                         logger.error("Record sending failed. ", exception);
+                    } else {
+                        logger.info("Record sent, {}.", metadata);
                     }
                 }).get();
 
