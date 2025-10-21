@@ -35,10 +35,10 @@ class SetupData {
 
         for (var line : littleMissMuffet) {
             kafkaProducer.send(new ProducerRecord<>(TOPIC, 0, null, line), (metadata, exception) -> {
-                if (metadata != null) {
-                    logger.info("Message sent metadata: {}", metadata);
-                } else {
+                if (exception != null) {
                     logger.error("Error ", exception);
+                } else {
+                    logger.info("Message sent metadata: {}", metadata);
                 }
             }).get();
         }

@@ -1,9 +1,16 @@
 package com.pszymczyk.step1;
 
+import org.apache.kafka.clients.consumer.GroupProtocol;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
+import java.util.Properties;
+
+import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 
 class SubscribeRunner {
 
@@ -13,8 +20,13 @@ class SubscribeRunner {
 
     public static void main(String[] args) {
 
-        //Todo 1/3 - create Kafka Consumer
-        final KafkaConsumer<String, String> kafkaConsumer = null;
+        final var props = new Properties();
+        props.put(BOOTSTRAP_SERVERS_CONFIG, "[::1]:9092");
+        props.put(GROUP_ID_CONFIG, GROUP_ID);
+        props.put(GROUP_PROTOCOL_CONFIG, GroupProtocol.CONSUMER.name().toLowerCase(Locale.ROOT));
+        props.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        props.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+        final var kafkaConsumer = new KafkaConsumer<String, String>(props);
 
         final var mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
