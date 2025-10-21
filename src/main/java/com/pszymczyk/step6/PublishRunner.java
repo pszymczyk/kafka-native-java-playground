@@ -1,4 +1,4 @@
-package com.pszymczyk.step1;
+package com.pszymczyk.step6;
 
 import com.pszymczyk.Utils;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -11,13 +11,11 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Random;
 
-import static org.apache.kafka.clients.producer.ProducerConfig.BOOTSTRAP_SERVERS_CONFIG;
-import static org.apache.kafka.clients.producer.ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG;
-import static org.apache.kafka.clients.producer.ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG;
+import static org.apache.kafka.clients.producer.ProducerConfig.*;
 
 class PublishRunner {
 
-    private static final String TOPIC = "step1";
+    private static final String TOPIC = "my-queue";
     private static final Logger logger = LoggerFactory.getLogger(PublishRunner.class);
     private static final Random random = new Random();
 
