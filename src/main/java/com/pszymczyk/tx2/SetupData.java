@@ -26,10 +26,10 @@ class SetupData {
         Utils.readLines("warszawa-krucza49_24-10-2023.csv").forEach(line -> {
             try {
                 kafkaProducer.send(new ProducerRecord<>(topic, line), (metadata, exception) -> {
-                    if (metadata != null) {
-                        logger.info("Record sent, {}.", metadata);
-                    } else {
+                    if (exception != null) {
                         logger.error("Record sending failed. ", exception);
+                    } else {
+                        logger.info("Record sent, {}.", metadata);
                     }
                 }).get();
             } catch (Exception exception) {
